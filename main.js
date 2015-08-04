@@ -119,7 +119,7 @@ var snake = {
 
     pushSegment: function(x, y) {
         // Store the index of the new segment
-        this.tailIndices[x * SIZE_Y + y] = this.tailIn;
+        this.setTailIndexAt(x, y, this.tailIn);
 
         // Add the segment to the circular buffer
         this.tail[this.tailIn].x = x;
@@ -128,9 +128,9 @@ var snake = {
     },
 
     popSegment: function() {
-        // Remember that this segment is free now
+        // Remember that this cell is free now
         var segment = this.tail[this.tailOut];
-        this.tailIndices[segment.x * SIZE_Y + segment.y] = this.FREE;
+        this.setTailIndexAt(segment.x, segment.y, this.FREE);
 
         // Remove tail segment from the circular buffer
         this.tailOut = (this.tailOut + 1) % this.tail.length;
@@ -142,10 +142,21 @@ var snake = {
             % this.tail.length;
     },
 
+    // Returns the index of tail segment in the given cell.
+    // Returns FREE for head cell and for empty cells
+    tailIndexAt: function(x, y) {
+        return this.tailIndices[x * SIZE_Y + y];
+    },
+
+    // Set the index of tail segment in the given cell
+    setTailIndexAt: function(x, y, val) {
+        this.tailIndices[x * SIZE_Y + y] = val;
+    },
+
     // Returns which part of snake is over the given cell: head, tail segment, or nothing
-    segmentInCell: function(x, y) {
+    segmentKindAt: function(x, y) {
         return (x == this.headX && y == this.headY) ? this.HEAD :
-            (this.tailIndices[x * SIZE_Y + y] == this.FREE) ? this.FREE : this.TAIL;
+            (this.tailIndexAt(x, y) == this.FREE) ? this.FREE : this.TAIL;
     },
 
     // Initialize the structure: empty snake (only the head) in the center
@@ -178,6 +189,32 @@ var snake = {
         // Move the head
         this.headX += directions.dx[this.headDir];
         this.headY += directions.dy[this.headDir];
+
+        // Detect if we've made a loop
+        this.checkLoop();
+    },
+
+    // Check if we've made a loop. If so, remove the looping part of the snake
+    checkLoop: function() {
+        // Don't do anything if snake has hit the wall
+        if(!inBounds(this.headX, this.headY)) {
+            return;
+        }
+
+        // Find out which segment we've bitten, if any
+        var biteIndex = this.tailIndexAt(this.headX, this.headY);
+        if(biteIndex == this.FREE) {
+            return;
+        }
+
+        // Remove the part betveen the head (exclusive) and the bitten segment (inclusive)
+        for(var index = biteIndex; index != this.tailIn;
+            index = (index + 1) % this.tail.length)
+        {
+            var segment = this.tail[index];
+            this.setTailIndexAt(segment.x, segment.y, this.FREE);
+        }
+        this.tailIn = biteIndex;
     }
 };
 
@@ -206,13 +243,13 @@ var grid = {
         }
     },
 
-    // Animate the death/birth that occurred in the last tick()
-    animateTick: function() {
+    // Animate Life & snake: show what happened in their last tick()
+    tick: function() {
         for(var x = 0; x < SIZE_X; x++) {
             for(var y = 0; y < SIZE_Y; y++) {
                 var sprite = this.sprites[x * SIZE_Y + y];
 
-                switch(snake.segmentInCell(x, y)) {
+                switch(snake.segmentKindAt(x, y)) {
                     case snake.HEAD:
                         sprite.visible = true;
                         sprite.animations.stop();
@@ -257,6 +294,10 @@ var grid = {
     }
 };
 
+// Checks whether the given coordinates are in the field's boundaries
+function inBounds(x, y) {
+    return (x >= 0) && (y >= 0) && (x < SIZE_X) && (y < SIZE_Y);
+}
 
 function preload() {
     game.load.spritesheet('cell', 'assets/cells.png', 12, 12);
@@ -274,5 +315,5 @@ function create() {
 function tickUpdate() {
     life.tick();
     snake.tick();
-    grid.animateTick();
+    grid.tick();
 }
