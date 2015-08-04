@@ -15,6 +15,7 @@ var SIZE_Y = 30;
 // Delay between life ticks, in milliseconds
 var TICK_DELAY = 300;
 
+// Game of Life field (the logical part, not the visualization)
 var life = {
     // SIZE_X * SIZE_Y booleans. true/false = alive/dead cell.
     cells: [],
@@ -22,26 +23,14 @@ var life = {
     // Values of cells in the previous tick
     oldCells: [],
 
-    // SIZE_X * SIZE_Y sprites to display cells.
-    sprites: [],
-
     // Initialize Life
     create: function() {
-        var grp = game.add.spriteBatch();
-
         for(var x = 0; x < SIZE_X; x++) {
             for(var y = 0; y < SIZE_Y; y++) {
                 // Initialize cells with random values
                 this.cells.push(!game.rnd.between(0, 4));
                 this.oldCells.push(false);
 
-                // Create sprites to display cells and their death/birth animations
-                var sprite = grp.create(FIELD_X + CELL_SIZE * x, FIELD_Y + CELL_SIZE * y,
-                    'life');
-                sprite.animations.add('die', [0, 1, 2, 3], 9, false);
-                sprite.animations.add('appear', [3, 2, 1, 0], 9, false);
-                sprite.visible = false;
-                this.sprites.push(sprite);
             }
         }
     },
@@ -92,13 +81,35 @@ var life = {
         }
     },
 
+};
+
+// The grid SIZE_X * SIZE_Y grid of sprites to display the game field.
+// This includes the Life cells and the snake's tail.
+var grid = {
+    sprites: [],
+
+    create: function() {
+        var grp = game.add.spriteBatch();
+
+        for(var x = 0; x < SIZE_X; x++) {
+            for(var y = 0; y < SIZE_Y; y++) {
+                var sprite = grp.create(FIELD_X + CELL_SIZE * x, FIELD_Y + CELL_SIZE * y,
+                    'cell');
+                sprite.animations.add('die', [0, 1, 2, 3], 9, false);
+                sprite.animations.add('appear', [3, 2, 1, 0], 9, false);
+                sprite.visible = false;
+                this.sprites.push(sprite);
+            }
+        }
+    },
+
     // Animate the death/birth that occured in the last tick()
-    animate: function() {
-        for(var i = 0; i < this.cells.length; i++) {
+    animateTick: function() {
+        for(var i = 0; i < this.sprites.length; i++) {
             var sprite = this.sprites[i];
-            if(this.cells[i]) {
+            if(life.cells[i]) {
                 sprite.visible = true;
-                if(!this.oldCells[i]) {
+                if(!life.oldCells[i]) {
                     // Just appeared, play animation
                     sprite.animations.play('appear');
                 } else {
@@ -106,7 +117,7 @@ var life = {
                     sprite.animations.stop();
                     sprite.frame = 0;
                 }
-            } else if(this.oldCells[i]) {
+            } else if(life.oldCells[i]) {
                 // Just died, play animation
                 sprite.animations.play('die');
             } else {
@@ -117,14 +128,16 @@ var life = {
     }
 };
 
+var snake = {
+};
+
 function preload() {
-    game.load.image('tail', 'assets/tail-cell.png'); // 12x12
-    game.load.image('head', 'assets/head-cell.png'); // 12x12
-    game.load.spritesheet('life', 'assets/life-cells.png', 12, 12);
+    game.load.spritesheet('cell', 'assets/cells.png', 12, 12);
 }
 
 function create() {
     life.create();
+    grid.create();
 
     game.time.advancedTiming = true;
     game.time.events.loop(TICK_DELAY, tickUpdate);
@@ -132,5 +145,5 @@ function create() {
 
 function tickUpdate() {
     life.tick();
-    life.animate();
+    grid.animateTick();
 }
