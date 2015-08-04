@@ -1,4 +1,4 @@
-var game = new Phaser.Game(640, 360, Phaser.AUTO, '',
+var game = new Phaser.Game(640, 480, Phaser.AUTO, '',
     { preload: preload, create: create});
 
 // Top-left corner of the game field
@@ -13,7 +13,18 @@ var SIZE_X = 50;
 var SIZE_Y = 30;
 
 // Delay between life ticks, in milliseconds
-var TICK_DELAY = 300;
+var TICK_DELAY = 200;
+
+// Constants to operate with the 4 directions
+var directions = {
+    RIGHT: 0,
+    DOWN: 1,
+    LEFT: 2,
+    UP: 3,
+
+    dx: [1, 0, -1, 0],
+    dy: [0, 1, 0, -1]
+};
 
 // Game of Life field (the logical part, not the visualization)
 var life = {
@@ -22,6 +33,20 @@ var life = {
 
     // Values of cells in the previous tick
     oldCells: [],
+
+    // Convenience functions to access these arrays
+
+    cellAt: function(x, y) {
+        return this.cells[x * SIZE_Y + y];
+    },
+
+    setCellAt: function(x, y, val) {
+        this.cells[x * SIZE_Y + y] = val;
+    },
+
+    oldCellAt: function(x, y) {
+        return this.oldCells[x * SIZE_Y + y];
+    },
 
     // Initialize Life
     create: function() {
@@ -33,21 +58,6 @@ var life = {
 
             }
         }
-    },
-
-    // Read the cell at the given position
-    cellAt: function(x, y) {
-        return this.cells[x * SIZE_Y + y];
-    },
-
-    // Write the cell at the given position
-    setCellAt: function(x, y, val) {
-        this.cells[x * SIZE_Y + y] = val;
-    },
-
-    // Read the previous cell value at the given position
-    oldCellAt: function(x, y) {
-        return this.oldCells[x * SIZE_Y + y];
     },
 
     // Make a step according to the rules of the automaton.
@@ -83,9 +93,102 @@ var life = {
 
 };
 
-// The grid SIZE_X * SIZE_Y grid of sprites to display the game field.
+var snake = {
+    FREE: -1, // "Snake isn't over this cell"
+    HEAD: -2, // "Snake's head is in this cell"
+    TAIL: -3, // "Snake's non-head segment is in this cell"
+
+    // Head position and movement direction
+    headX: Math.round(SIZE_X / 2),
+    headY: Math.round(SIZE_Y / 2),
+    headDir: directions.UP,
+
+    // The desired length of the snake. Can be larger than the actual length,
+    // in which case the snake will steadily grow.
+    desiredLength: 8,
+
+    // Circular buffer for the tail segments
+    tail: [],
+    tailIn: 0,
+    tailOut: 0,
+
+    // The "reversed" version of the circular buffer. For each field cell gives
+    // the index of the tail segment over that cell,  or -1 if that field cell
+    // isn't under the snake.
+    tailIndices: [],
+
+    pushSegment: function(x, y) {
+        // Store the index of the new segment
+        this.tailIndices[x * SIZE_Y + y] = this.tailIn;
+
+        // Add the segment to the circular buffer
+        this.tail[this.tailIn].x = x;
+        this.tail[this.tailIn].y = y;
+        this.tailIn = (this.tailIn + 1) % this.tail.length;
+    },
+
+    popSegment: function() {
+        // Remember that this segment is free now
+        var segment = this.tail[this.tailOut];
+        this.tailIndices[segment.x * SIZE_Y + segment.y] = this.FREE;
+
+        // Remove tail segment from the circular buffer
+        this.tailOut = (this.tailOut + 1) % this.tail.length;
+    },
+
+    // Returns the snake's length, head included
+    length: function() {
+        return (this.tailIn - this.tailOut + this.tail.length)
+            % this.tail.length;
+    },
+
+    // Returns which part of snake is over the given cell: head, tail segment, or nothing
+    segmentInCell: function(x, y) {
+        return (x == this.headX && y == this.headY) ? this.HEAD :
+            (this.tailIndices[x * SIZE_Y + y] == this.FREE) ? this.FREE : this.TAIL;
+    },
+
+    // Initialize the structure: empty snake (only the head) in the center
+    // of the screen
+    create: function() {
+        for(var i = 0; i < SIZE_X * SIZE_Y + 1; i++) {
+            this.tail.push({
+                x: 0,
+                y: 0
+            });
+        }
+
+        for(var x = 0; x < SIZE_X; x++) {
+            for(var y = 0; y < SIZE_Y; y++) {
+                this.tailIndices.push(this.FREE);
+            }
+        }
+    },
+
+    // Advance the snake one step further
+    tick: function() {
+        // Advance the tail
+        this.pushSegment(this.headX, this.headY);
+
+        // Remove the last tail segment, unless we are growing
+        if(this.length() >= this.desiredLength) {
+            this.popSegment();
+        }
+
+        // Move the head
+        this.headX += directions.dx[this.headDir];
+        this.headY += directions.dy[this.headDir];
+    }
+};
+
+// The SIZE_X * SIZE_Y grid of sprites to display the game field.
 // This includes the Life cells and the snake's tail.
 var grid = {
+    ALIVE_FRAME: 0, // A cell that's alive
+    HEAD_FRAME: 4,  // The snake's head
+    TAIL_FRAME: 5,  // A cell in the snake's tail
+
+    // One sprite for each grid cell
     sprites: [],
 
     create: function() {
@@ -103,33 +206,57 @@ var grid = {
         }
     },
 
-    // Animate the death/birth that occured in the last tick()
+    // Animate the death/birth that occurred in the last tick()
     animateTick: function() {
-        for(var i = 0; i < this.sprites.length; i++) {
-            var sprite = this.sprites[i];
-            if(life.cells[i]) {
-                sprite.visible = true;
-                if(!life.oldCells[i]) {
-                    // Just appeared, play animation
-                    sprite.animations.play('appear');
-                } else {
-                    // Old cell, show as fully alive
-                    sprite.animations.stop();
-                    sprite.frame = 0;
+        for(var x = 0; x < SIZE_X; x++) {
+            for(var y = 0; y < SIZE_Y; y++) {
+                var sprite = this.sprites[x * SIZE_Y + y];
+
+                switch(snake.segmentInCell(x, y)) {
+                    case snake.HEAD:
+                        sprite.visible = true;
+                        sprite.animations.stop();
+                        sprite.frame = this.HEAD_FRAME;
+                        break;
+
+                    case snake.TAIL:
+                        sprite.visible = true;
+                        sprite.animations.stop();
+                        sprite.frame = this.TAIL_FRAME;
+                        break;
+
+                    default:
+                        this.showLifeSprite(sprite, x, y);
+                        break;
                 }
-            } else if(life.oldCells[i]) {
-                // Just died, play animation
-                sprite.animations.play('die');
-            } else {
-                // Died long ago, hide completely
-                sprite.visible = false;
             }
+        }
+    },
+
+    showLifeSprite: function(sprite, x, y) {
+        var isAlive = life.cellAt(x, y);
+        var wasAlive = life.oldCellAt(x, y);
+
+        if(isAlive) {
+            sprite.visible = true;
+            if(!wasAlive) {
+                // Just appeared, play animation
+                sprite.animations.play('appear');
+            } else {
+                // Old cell, show as fully alive
+                sprite.animations.stop();
+                sprite.frame = this.ALIVE_FRAME;
+            }
+        } else if(wasAlive) {
+            // Just died, play animation
+            sprite.animations.play('die');
+        } else {
+            // Died long ago, hide completely
+            sprite.visible = false;
         }
     }
 };
 
-var snake = {
-};
 
 function preload() {
     game.load.spritesheet('cell', 'assets/cells.png', 12, 12);
@@ -137,6 +264,7 @@ function preload() {
 
 function create() {
     life.create();
+    snake.create();
     grid.create();
 
     game.time.advancedTiming = true;
@@ -145,5 +273,6 @@ function create() {
 
 function tickUpdate() {
     life.tick();
+    snake.tick();
     grid.animateTick();
 }
