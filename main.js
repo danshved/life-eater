@@ -177,7 +177,12 @@ var snake = {
     },
 
     // Advance the snake one step further
-    tick: function() {
+    // direction (optional): which way to turn.
+    tick: function(direction) {
+        if(direction !== undefined) {
+            this.headDir = direction;
+        }
+
         // Advance the tail
         this.pushSegment(this.headX, this.headY);
 
@@ -294,6 +299,30 @@ var grid = {
     }
 };
 
+// Keyboard input queue
+var inputQueue = {
+    MAX_LENGTH: 8,
+
+    create: function() {
+        this.cursor = game.input.keyboard.createCursorKeys();
+        this.cursor.down.onDown.add(this.onCursorKey, this);
+        this.cursor.up.onDown.add(this.onCursorKey, this);
+        this.cursor.right.onDown.add(this.onCursorKey, this);
+        this.cursor.left.onDown.add(this.onCursorKey, this);
+    },
+
+    onCursorKey: function(key) {
+        var direction = (key === this.cursor.down) ? directions.DOWN:
+            (key === this.cursor.up) ? directions.UP:
+            (key === this.cursor.right) ? directions.RIGHT:
+            (key === this.cursor.left) ? directions.LEFT: undefined;
+
+        if(direction !== undefined) {
+            snake.headDir = direction;
+        }
+    }
+};
+
 // Checks whether the given coordinates are in the field's boundaries
 function inBounds(x, y) {
     return (x >= 0) && (y >= 0) && (x < SIZE_X) && (y < SIZE_Y);
@@ -307,6 +336,7 @@ function create() {
     life.create();
     snake.create();
     grid.create();
+    inputQueue.create();
 
     game.time.advancedTiming = true;
     game.time.events.loop(TICK_DELAY, tickUpdate);
