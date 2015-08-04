@@ -301,9 +301,45 @@ var grid = {
 
 // Keyboard input queue
 var inputQueue = {
-    MAX_LENGTH: 8,
+    MAX_LENGTH: 4,
+
+    // Circular buffer with the queue. Each item is a direction [0..3]
+    queue: [],
+    queueIn: 0,
+    queueOut: 0,
+
+    // Find out how many keys are in the queue
+    length: function() {
+        return (this.queueIn - this.queueOut + this.queue.length) % this.queue.length;
+    },
+
+    // Push a new direction to the queue (unless it's full)
+    maybePush: function(dir) {
+        if(this.length() < this.MAX_LENGTH) {
+            this.queue[this.queueIn] = dir;
+            this.queueIn = (this.queueIn + 1) % this.queue.length;
+        }
+    },
+
+    // Pop a key from the queue.
+    // Returns the key that was popped, or undefined if quueue was empty.
+    maybePop: function() {
+        if(this.length() != 0) {
+            var result = this.queue[this.queueOut];
+            this.queueOut = (this.queueOut + 1) % this.queue.length;
+            return result;
+        } else {
+            return undefined;
+        }
+    },
 
     create: function() {
+        // Initialize the circular buffer
+        for(var i = 0; i < this.MAX_LENGTH; i++) {
+            this.queue.push(directions.UP);
+        }
+
+        // Subscribe to keyboard events
         this.cursor = game.input.keyboard.createCursorKeys();
         this.cursor.down.onDown.add(this.onCursorKey, this);
         this.cursor.up.onDown.add(this.onCursorKey, this);
@@ -312,13 +348,13 @@ var inputQueue = {
     },
 
     onCursorKey: function(key) {
-        var direction = (key === this.cursor.down) ? directions.DOWN:
+        var dir = (key === this.cursor.down) ? directions.DOWN:
             (key === this.cursor.up) ? directions.UP:
             (key === this.cursor.right) ? directions.RIGHT:
             (key === this.cursor.left) ? directions.LEFT: undefined;
 
-        if(direction !== undefined) {
-            snake.headDir = direction;
+        if(dir !== undefined) {
+            this.maybePush(dir);
         }
     }
 };
@@ -343,7 +379,12 @@ function create() {
 }
 
 function tickUpdate() {
+    // Make a step in the Game of Life
     life.tick();
-    snake.tick();
+
+    // Make the snake, turning if there was user input
+    snake.tick(inputQueue.maybePop());
+
+    // Show what happened on the game field
     grid.tick();
 }
