@@ -111,7 +111,7 @@ var snake = {
 
     // The desired length of the snake. Can be larger than the actual length,
     // in which case the snake will steadily grow.
-    desiredLength: 40,
+    desiredLength: 30,
 
     // Circular buffer for the tail segments
     tail: [],
@@ -153,7 +153,7 @@ var snake = {
     // Returns the snake's length, head included
     length: function() {
         return (this.tailIn - this.tailOut + this.tail.length)
-            % this.tail.length;
+            % this.tail.length + 1;
     },
 
     // Returns the index of tail segment in the given cell.
@@ -210,8 +210,8 @@ var snake = {
         // Advance the tail
         this.pushSegment(this.headX, this.headY);
 
-        // Remove the last tail segment, unless we are growing
-        if(this.length() >= this.desiredLength) {
+        // Don't let length exceed the desired value
+        if(this.length() > this.desiredLength) {
             this.popSegment();
         }
 
