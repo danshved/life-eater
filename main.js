@@ -94,6 +94,9 @@ var life = {
 };
 
 var snake = {
+    // Minimal allowed (desired) length of the snake
+    MIN_LENGTH: 3,
+
     // Classification of field cells w.r.t. the snake
     FREE: -1, // "Snake isn't over this cell"
     HEAD: -2, // "Snake's head is in this cell"
@@ -252,6 +255,12 @@ var snake = {
             this.setTailIndexAt(segment.x, segment.y, this.FREE);
         }
         this.tailIn = biteIndex;
+
+        // Reduce length by 1 unit, so that player has to eat cherry now and then
+        this.desiredLength--;
+        if(this.desiredLength < this.MIN_LENGTH) {
+            this.desiredLength = this.MIN_LENGTH;
+        }
     },
 
     // Classify all field cells w.r.t. a loop made by the snake
