@@ -10,7 +10,7 @@ var CELL_SIZE = 12;
 
 // Field size, in cells
 var SIZE_X = 50;
-var SIZE_Y = 30;
+var SIZE_Y = 40;
 
 // Delay between life ticks, in milliseconds
 var TICK_DELAY = 200;
@@ -94,9 +94,15 @@ var life = {
 };
 
 var snake = {
+    // Classification of field cells w.r.t. the snake
     FREE: -1, // "Snake isn't over this cell"
     HEAD: -2, // "Snake's head is in this cell"
     TAIL: -3, // "Snake's non-head segment is in this cell"
+
+    // Classification of field cells w.r.t. the surrounding made by the snake
+    INSIDE: -4,
+    OUTSIDE: -5,
+    BORDER: -6,
 
     // Head position and movement direction
     headX: Math.round(SIZE_X / 2),
@@ -105,7 +111,7 @@ var snake = {
 
     // The desired length of the snake. Can be larger than the actual length,
     // in which case the snake will steadily grow.
-    desiredLength: 8,
+    desiredLength: 40,
 
     // Circular buffer for the tail segments
     tail: [],
@@ -117,6 +123,13 @@ var snake = {
     // isn't under the snake.
     tailIndices: [],
 
+    // Whether or not there was a loop removal in the last tick()
+    hadLoop: false,
+
+    // The class of each cell w.r.t. the last loop made by the snake
+    loopClasses: [],
+
+    // Add new tail segment
     pushSegment: function(x, y) {
         // Store the index of the new segment
         this.setTailIndexAt(x, y, this.tailIn);
@@ -127,6 +140,7 @@ var snake = {
         this.tailIn = (this.tailIn + 1) % this.tail.length;
     },
 
+    // Remove the last tail segment (FIFO)
     popSegment: function() {
         // Remember that this cell is free now
         var segment = this.tail[this.tailOut];
@@ -159,6 +173,15 @@ var snake = {
             (this.tailIndexAt(x, y) == this.FREE) ? this.FREE : this.TAIL;
     },
 
+    // Get/set the loop class of the given cell
+    loopClassAt: function(x, y) {
+        return this.loopClasses[x * SIZE_Y + y];
+    },
+
+    setLoopClassAt: function(x, y, val) {
+        this.loopClasses[x * SIZE_Y + y] = val;
+    },
+
     // Initialize the structure: empty snake (only the head) in the center
     // of the screen
     create: function() {
@@ -172,6 +195,7 @@ var snake = {
         for(var x = 0; x < SIZE_X; x++) {
             for(var y = 0; y < SIZE_Y; y++) {
                 this.tailIndices.push(this.FREE);
+                this.loopClasses.push(this.OUTSIDE);
             }
         }
     },
@@ -201,6 +225,8 @@ var snake = {
 
     // Check if we've made a loop. If so, remove the looping part of the snake
     checkLoop: function() {
+        this.hadLoop = false;
+
         // Don't do anything if snake has hit the wall
         if(!inBounds(this.headX, this.headY)) {
             return;
@@ -212,7 +238,13 @@ var snake = {
             return;
         }
 
-        // Remove the part betveen the head (exclusive) and the bitten segment (inclusive)
+        // Remember that there was a loop, and remember which cells were
+        // inside/on the border of this loop.
+        this.hadLoop = true;
+        this.loopClassify(biteIndex, this.tailIn);
+
+        // Remove the looping part, i.e. all cells between the head (exclusive)
+        // and the bitten segment (inclusive)
         for(var index = biteIndex; index != this.tailIn;
             index = (index + 1) % this.tail.length)
         {
@@ -220,8 +252,65 @@ var snake = {
             this.setTailIndexAt(segment.x, segment.y, this.FREE);
         }
         this.tailIn = biteIndex;
+    },
+
+    // Classify all field cells w.r.t. a loop made by the snake
+    // [start, end): indices of segments making the loop (in the ``tail'' circular array)
+    loopClassify: function(start, end) {
+        for(var x = 0; x < SIZE_X; x++) {
+            // We always start outside the loop
+            var curClass = this.OUTSIDE;
+
+            // X-components of the first and last encountered wall segments
+            var firstDiff = 0;
+            var lastDiff = 0;
+
+            for(var y = 0; y < SIZE_Y; y++) {
+                // Determine if this cell is on the border
+                var index = this.tailIndexAt(x, y);
+
+                // If we're on the border or just got off it, update our classification
+                if(index != this.FREE && this.indexIsBetween(start, index, end)) {
+                    // We lie on the loop, i.e. on the border of the surrounding
+                    curClass = this.BORDER;
+
+                    // Find our two neighbors on the loop
+                    var prevIndex = (index == start) ? end : index;
+                    prevIndex = (prevIndex - 1 + this.tail.length) % this.tail.length;
+
+                    var nextIndex = (index + 1) % this.tail.length;
+                    if(nextIndex == end) {
+                        nextIndex = start;
+                    }
+
+                    // Determine whecher the border goes right or left here
+                    lastDiff = this.tail[nextIndex].x - this.tail[prevIndex].x;
+                    if(firstDiff == 0) {
+                        firstDiff = lastDiff;
+                    }
+                } else if(curClass == this.BORDER) {
+                    // We were on the wall, but aren't any longer. Determine whether
+                    // we're inside or outside based on the wall's left/right direction.
+                    curClass = (firstDiff * lastDiff > 0) ? this.INSIDE : this.OUTSIDE;
+                }
+
+                this.setLoopClassAt(x, y, curClass);
+            }
+        }
+    },
+
+    // Utility: checks that index b belongs to [a, c) in the cyclic sense
+    // (as indices in the ``tail'' buffer)
+    indexIsBetween: function(a, b, c) {
+        if(a <= c) {
+            return (a <= b) && (b < c);
+        } else {
+            return (a <= b) || (b < c);
+        }
     }
-};
+
+}; // var snake = {...}
+
 
 // The SIZE_X * SIZE_Y grid of sprites to display the game field.
 // This includes the Life cells and the snake's tail.
@@ -242,6 +331,7 @@ var grid = {
                     'cell');
                 sprite.animations.add('die', [0, 1, 2, 3], 9, false);
                 sprite.animations.add('appear', [3, 2, 1, 0], 9, false);
+                sprite.animations.add('annihilate', [6, 7, 8, 9], 12, false);
                 sprite.visible = false;
                 this.sprites.push(sprite);
             }
@@ -253,26 +343,32 @@ var grid = {
         for(var x = 0; x < SIZE_X; x++) {
             for(var y = 0; y < SIZE_Y; y++) {
                 var sprite = this.sprites[x * SIZE_Y + y];
+                var snakeKind = snake.segmentKindAt(x, y);
 
-                switch(snake.segmentKindAt(x, y)) {
-                    case snake.HEAD:
-                        sprite.visible = true;
-                        sprite.animations.stop();
-                        sprite.frame = this.HEAD_FRAME;
-                        break;
-
-                    case snake.TAIL:
-                        sprite.visible = true;
-                        sprite.animations.stop();
-                        sprite.frame = this.TAIL_FRAME;
-                        break;
-
-                    default:
-                        this.showLifeSprite(sprite, x, y);
-                        break;
+                if(snakeKind == snake.HEAD) {
+                    this.showFrame(sprite, this.HEAD_FRAME);
+                } else if(snakeKind == snake.TAIL) {
+                    this.showFrame(sprite, this.TAIL_FRAME);
+                } else if(snake.hadLoop && snake.loopClassAt(x, y) != snake.OUTSIDE) {
+                    this.showAnimation(sprite, 'annihilate');
+                } else {
+                    this.showLifeSprite(sprite, x, y);
                 }
             }
         }
+    },
+
+    showFrame: function(sprite, frame) {
+        sprite.visible = true;
+        sprite.animations.stop();
+        sprite.frame = frame;
+    },
+
+    showAnimation: function(sprite, name) {
+        sprite.visible = true;
+        var animation = sprite.animations.getAnimation(name);
+        animation.restart();
+        sprite.animations.play(name);
     },
 
     showLifeSprite: function(sprite, x, y) {
@@ -280,21 +376,17 @@ var grid = {
         var wasAlive = life.oldCellAt(x, y);
 
         if(isAlive) {
-            sprite.visible = true;
-            if(!wasAlive) {
-                // Just appeared, play animation
-                sprite.animations.play('appear');
+            if(wasAlive) {
+                this.showFrame(sprite, this.ALIVE_FRAME);
             } else {
-                // Old cell, show as fully alive
-                sprite.animations.stop();
-                sprite.frame = this.ALIVE_FRAME;
+                this.showAnimation(sprite, 'appear');
             }
-        } else if(wasAlive) {
-            // Just died, play animation
-            sprite.animations.play('die');
         } else {
-            // Died long ago, hide completely
-            sprite.visible = false;
+            if(wasAlive) {
+                this.showAnimation(sprite, 'die');
+            } else {
+                sprite.visible = false;
+            }
         }
     }
 };
@@ -375,15 +467,26 @@ function create() {
     inputQueue.create();
 
     game.time.advancedTiming = true;
-    game.time.events.loop(TICK_DELAY, tickUpdate);
+    game.time.events.loop(TICK_DELAY, tick);
 }
 
-function tickUpdate() {
+function tick() {
     // Make a step in the Game of Life
     life.tick();
 
-    // Make the snake, turning if there was user input
+    // Make a snake's step, turning if there was user input
     snake.tick(inputQueue.maybePop());
+
+    // If the snake surrounded something, destroy all Life there
+    if(snake.hadLoop) {
+        for(var x = 0; x < SIZE_X; x++) {
+            for(var y = 0; y < SIZE_Y; y++) {
+                if(snake.loopClassAt(x, y) != snake.OUTSIDE) {
+                    life.setCellAt(x, y, false);
+                }
+            }
+        }
+    }
 
     // Show what happened on the game field
     grid.tick();
