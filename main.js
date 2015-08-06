@@ -114,7 +114,7 @@ var snake = {
 
     // The desired length of the snake. Can be larger than the actual length,
     // in which case the snake will steadily grow.
-    desiredLength: 30,
+    desiredLength: 15,
 
     // Circular buffer for the tail segments
     tail: [],
@@ -324,9 +324,10 @@ var snake = {
 // The SIZE_X * SIZE_Y grid of sprites to display the game field.
 // This includes the Life cells and the snake's tail.
 var grid = {
-    ALIVE_FRAME: 0, // A cell that's alive
-    HEAD_FRAME: 4,  // The snake's head
-    TAIL_FRAME: 5,  // A cell in the snake's tail
+    ALIVE_FRAME: 0,   // A Life cell
+    HEAD_FRAME: 4,    // The snake's head
+    TAIL_FRAME: 5,    // The snake's body segment
+    CHERRY_FRAME: 10,
 
     // One sprite for each grid cell
     sprites: [],
@@ -354,7 +355,9 @@ var grid = {
                 var sprite = this.sprites[x * SIZE_Y + y];
                 var snakeKind = snake.segmentKindAt(x, y);
 
-                if(snakeKind == snake.HEAD) {
+                if(cherry.exists && cherry.x == x && cherry.y == y) {
+                    this.showFrame(sprite, this.CHERRY_FRAME);
+                } else if(snakeKind == snake.HEAD) {
                     this.showFrame(sprite, this.HEAD_FRAME);
                 } else if(snakeKind == snake.TAIL) {
                     this.showFrame(sprite, this.TAIL_FRAME);
@@ -460,6 +463,13 @@ var inputQueue = {
     }
 };
 
+// The cherry that can be eaten for growth
+var cherry = {
+    exists: false,
+    x: 0,
+    y: 0
+};
+
 // Checks whether the given coordinates are in the field's boundaries
 function inBounds(x, y) {
     return (x >= 0) && (y >= 0) && (x < SIZE_X) && (y < SIZE_Y);
@@ -472,6 +482,7 @@ function preload() {
 function create() {
     life.create();
     snake.create();
+    maybeSpawnCherry();
     grid.create();
     inputQueue.create();
 
@@ -483,8 +494,19 @@ function tick() {
     // Make a step in the Game of Life
     life.tick();
 
+    // Destroy the cherry if life crept on it
+    if(cherry.exists && life.cellAt(cherry.x, cherry.y)) {
+        cherry.exists = false;
+    }
+
     // Make a snake's step, turning if there was user input
     snake.tick(inputQueue.maybePop());
+
+    // Snake grows when it eats the cherry
+    if(cherry.exists && cherry.x == snake.headX && cherry.y == snake.headY) {
+        cherry.exists = false;
+        snake.desiredLength++;
+    }
 
     // If the snake surrounded something, destroy all Life there
     if(snake.hadLoop) {
@@ -497,6 +519,20 @@ function tick() {
         }
     }
 
+    // Respawn the cherry if it was eaten/destroyed
+    if(!cherry.exists) {
+        maybeSpawnCherry();
+    }
+
     // Show what happened on the game field
     grid.tick();
+
+    // Show the cherry
+}
+
+function maybeSpawnCherry() {
+    cherry.x = game.rnd.between(0, SIZE_X - 1);
+    cherry.y = game.rnd.between(0, SIZE_Y - 1);
+    cherry.exists = !life.cellAt(cherry.x, cherry.y) &&
+        (snake.segmentKindAt(cherry.x, cherry.y) == snake.FREE);
 }
