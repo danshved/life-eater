@@ -682,3 +682,6 @@ function maybeSpawnCherry() {
     cherry.exists = !life.cellAt(cherry.x, cherry.y) &&
         (snake.segmentKindAt(cherry.x, cherry.y) == snake.FREE);
 }
+
+// TODO: remove colonyView, use grid. Don't show future colony over existing life
+// and over the snake. Do show it over the cherry.
