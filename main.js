@@ -2,15 +2,15 @@ var game = new Phaser.Game(640, 480, Phaser.AUTO, '',
     { preload: preload, create: create});
 
 // Top-left corner of the game field
-var FIELD_X = 20;
-var FIELD_Y = 0;
+var FIELD_X = 14;
+var FIELD_Y = 12;
 
 // Size of a cell on the game field (cells are squares)
 var CELL_SIZE = 12;
 
 // Field size, in cells
-var SIZE_X = 50;
-var SIZE_Y = 40;
+var SIZE_X = 51;
+var SIZE_Y = 38;
 
 // Delay between life ticks, in milliseconds
 var TICK_DELAY = 200;
@@ -53,7 +53,7 @@ var life = {
         for(var x = 0; x < SIZE_X; x++) {
             for(var y = 0; y < SIZE_Y; y++) {
                 // Initialize cells with random values
-                this.cells.push(!game.rnd.between(0, 4));
+                this.cells.push(!game.rnd.between(0, 7));
                 this.oldCells.push(false);
 
             }
@@ -477,14 +477,17 @@ function inBounds(x, y) {
 
 function preload() {
     game.load.spritesheet('cell', 'assets/cells.png', 12, 12);
+    game.load.image('background', 'assets/background.png');
 }
 
 function create() {
     life.create();
     snake.create();
     maybeSpawnCherry();
-    grid.create();
     inputQueue.create();
+
+    game.add.sprite(0, 0, 'background');
+    grid.create();
 
     game.time.advancedTiming = true;
     game.time.events.loop(TICK_DELAY, tick);
@@ -526,8 +529,6 @@ function tick() {
 
     // Show what happened on the game field
     grid.tick();
-
-    // Show the cherry
 }
 
 function maybeSpawnCherry() {
