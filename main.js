@@ -26,6 +26,9 @@ var directions = {
     dy: [0, 1, 0, -1]
 };
 
+// Current tick number
+var currentTick = 0;
+
 // Game of Life field (the logical part, not the visualization)
 var life = {
     // SIZE_X * SIZE_Y booleans. true/false = alive/dead cell.
@@ -53,9 +56,8 @@ var life = {
         for(var x = 0; x < SIZE_X; x++) {
             for(var y = 0; y < SIZE_Y; y++) {
                 // Initialize cells with random values
-                this.cells.push(!game.rnd.between(0, 7));
+                this.cells.push(false);
                 this.oldCells.push(false);
-
             }
         }
     },
@@ -90,6 +92,23 @@ var life = {
             }
         }
     },
+
+    // Add new Life group to the field based on a given rectangular pattern.
+    // Cells that are true in the pattern become alive.
+    // Cells that are false don't do anything.
+    //
+    // x, y: where to put the top-left corner of the pattern
+    // pattern: the Life to be added. must have properties ``sizeX'' and ``sizeY''
+    // and a method ``cellAt(x: number, y: number): boolean''.
+    add: function(x, y, pattern) {
+        for(var dx = 0; dx < pattern.sizeX; dx++) {
+            for(var dy = 0; dy < pattern.sizeY; dy++) {
+                if(pattern.cellAt(dx, dy)) {
+                    this.setCellAt((x + dx) % SIZE_X, (y + dy) % SIZE_Y, true);
+                }
+            }
+        }
+    }
 
 };
 
@@ -403,6 +422,85 @@ var grid = {
     }
 };
 
+// Visual representation of the colony to be spawned
+var colonyView = {
+    // Index of the "future colony" cell in the spritesheet
+    FRAME: 11,
+
+    // For how many ticks we show the future colony before it appears
+    BLINK_COUNT: 3,
+
+    // Whether we're showing the future colony at the moment
+    active: false,
+
+    // Pool for the sprites that we currently don't use
+    spritePool: null,
+
+    // The sprites that we use. Some of them are unused
+    sprites: [],
+
+    // The group for all the colony sprites
+    group: null,
+
+    createSprite: function() {
+        var sprite = this.group.create(0, 0, 'cell', 12, true);
+        sprite.frame = this.FRAME;
+        sprite.visible = false;
+        return sprite;
+    },
+
+    create: function() {
+        this.group = game.add.group();
+        this.spritePool = new ObjectPool(this.createSprite, this);
+    },
+
+    tick: function() {
+        // Decide if we should be showing the place of the future colony
+        // Stop showing in tick ``spawnTick'': in this tick the actual colony will
+        // already start showing.
+        var newActive = (currentTick >= colony.spawnTick - (2 * this.BLINK_COUNT)) &&
+            (currentTick < colony.spawnTick);
+
+        // Make the sprites visible/invisible
+        if(!this.active && newActive) {
+            this.createSprites();
+        } else if(this.active && !newActive) {
+            this.deleteSprites();
+        }
+        this.active = newActive;
+
+        // Blink if necessary
+        if(this.active) {
+            var visible = !!((colony.spawnTick - currentTick) % 2);
+            for(var i = 0; i < this.sprites.length; i++) {
+                this.sprites[i].visible = visible;
+            }
+        }
+    },
+
+    createSprites: function() {
+        for(var x = 0; x < colony.sizeX; x++) {
+            for(var y = 0; y < colony.sizeY; y++) {
+                if(colony.cellAt(x, y)) {
+                    var sprite = this.spritePool.allocate();
+                    sprite.x = FIELD_X + (colony.x + x) * CELL_SIZE;
+                    sprite.y = FIELD_Y + (colony.y + y) * CELL_SIZE;
+                    this.sprites.push(sprite);
+                }
+            }
+        }
+    },
+
+    deleteSprites: function() {
+        for(var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].visible = false;
+        }
+        this.sprites.length = 0;
+        // TODO: check that this doesn't lead to garbage collection
+    }
+
+};
+
 // Keyboard input queue
 var inputQueue = {
     MAX_LENGTH: 4,
@@ -470,6 +568,37 @@ var cherry = {
     y: 0
 };
 
+// Next Life colony that is about to be spawned
+var colony = {
+    // How many ticks pass between colony spawns
+    SPAWN_DELAY: 20,
+
+    // When the colony will be spawned
+    spawnTick: 0,
+
+    // Position of the colony's top left corner
+    x: 0,
+    y: 0,
+
+    // Size of the colony
+    sizeX: 2,
+    sizeY: 2,
+
+    // Colony cells
+    // x, y: RELATIVE coordinates inside the colony
+    cellAt: function(x, y) {
+        // TODO: add real implementation
+        return true;
+    },
+
+    // Choose a colony and determine when it will be spawned
+    generate: function() {
+        this.spawnTick = currentTick + this.SPAWN_DELAY;
+        this.x = game.rnd.between(0, SIZE_X - this.sizeX);
+        this.y = game.rnd.between(0, SIZE_Y - this.sizeY);
+    }
+};
+
 // Checks whether the given coordinates are in the field's boundaries
 function inBounds(x, y) {
     return (x >= 0) && (y >= 0) && (x < SIZE_X) && (y < SIZE_Y);
@@ -481,21 +610,33 @@ function preload() {
 }
 
 function create() {
+    // Initialize state of the game
     life.create();
+    colony.generate();
     snake.create();
     maybeSpawnCherry();
+
+    // Prepare to accept user input
     inputQueue.create();
 
+    // Create all the sprites
     game.add.sprite(0, 0, 'background');
     grid.create();
+    colonyView.create();
 
-    game.time.advancedTiming = true;
+    // Launch the main timer to measure ticks by which Life & Snake live.
     game.time.events.loop(TICK_DELAY, tick);
 }
 
 function tick() {
     // Make a step in the Game of Life
     life.tick();
+
+    // Drop a new Life colony if it's time
+    if(currentTick >= colony.spawnTick) {
+        life.add(colony.x, colony.y, colony);
+        colony.generate();
+    }
 
     // Destroy the cherry if life crept on it
     if(cherry.exists && life.cellAt(cherry.x, cherry.y)) {
@@ -529,6 +670,10 @@ function tick() {
 
     // Show what happened on the game field
     grid.tick();
+    colonyView.tick();
+
+    // Keep track of time
+    currentTick++;
 }
 
 function maybeSpawnCherry() {
