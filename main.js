@@ -513,7 +513,7 @@ var cherry = {
 // Next Life colony that is about to be spawned
 var colony = {
     // How many ticks pass between colony spawns
-    SPAWN_DELAY: 20,
+    SPAWN_DELAY: SIZE_X + SIZE_Y,
 
     // When the colony will be spawned
     spawnTick: 0,
@@ -526,11 +526,17 @@ var colony = {
     sizeX: 2,
     sizeY: 2,
 
+    // Colony cells as a boolean array
+    cells: [],
+
     // Colony cells
-    // x, y: RELATIVE coordinates inside the colony
+    // dx, dy: RELATIVE coordinates inside the colony
     cellAt: function(dx, dy) {
-        // TODO: add real implementation
-        return true;
+        return this.cells[dx * this.sizeY + dy];
+    },
+
+    setCellAt: function(dx, dy, value) {
+        this.cells[dx * this.sizeY + dy] = value;
     },
 
     // Like cellAt(), but x and y are ABSOLUTE coordinates
@@ -545,9 +551,37 @@ var colony = {
 
     // Choose a colony and determine when it will be spawned
     generate: function() {
-        this.spawnTick = currentTick + this.SPAWN_DELAY;
+        // Choose a pattern at random
+        var pattern = patterns[game.rnd.between(0, patterns.length - 1)];
+
+        // Copy the pattern to our memory
+        this.assignPattern(pattern);
+
+        // Choose the spawn position on the field
         this.x = game.rnd.between(0, SIZE_X - this.sizeX);
         this.y = game.rnd.between(0, SIZE_Y - this.sizeY);
+
+        // Schedule spawn time
+        this.spawnTick = currentTick + this.SPAWN_DELAY;
+    },
+
+    // Set the pattern that the colony will use
+    assignPattern: function(pattern) {
+        // Remember the size
+        this.sizeX = pattern.sizeX;
+        this.sizeY = pattern.sizeY;
+
+        // Allocate more memory if needed
+        if(this.cells.length < this.sizeX * this.sizeY) {
+            this.cells.length = this.sizeX * this.sizeY;
+        }
+
+        // Copy the data
+        for(var dx = 0; dx < this.sizeX; dx++) {
+            for(var dy = 0; dy < this.sizeY; dy++) {
+                this.setCellAt(dx, dy, pattern.cellAt(dx, dy));
+            }
+        }
     }
 };
 
@@ -632,3 +666,5 @@ function maybeSpawnCherry() {
     cherry.exists = !life.cellAt(cherry.x, cherry.y) &&
         (snake.segmentKindAt(cherry.x, cherry.y) == snake.FREE);
 }
+
+// TODO: when allocating arrays, set length directly instead of using pushes
