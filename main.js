@@ -347,6 +347,9 @@ var grid = {
     HEAD_FRAME: 4,    // The snake's head
     TAIL_FRAME: 5,    // The snake's body segment
     CHERRY_FRAME: 10,
+    COLONY_FRAME: 11, // Cell of a Life colony to be spawned
+
+    COLONY_BLINKS: 3, // How many times a colony preview blinks before the colony appears
 
     // One sprite for each grid cell
     sprites: [],
@@ -369,21 +372,58 @@ var grid = {
 
     // Animate Life & snake: show what happened in their last tick()
     tick: function() {
+        // Decide if we should be previewing the ``colony'', and if so,
+        // whether it's an "on" or "off" blink phase.
+        var colonyTicks = colony.spawnTick - currentTick;
+        var colonyVisible = (colonyTicks > 0) && (colonyTicks <= 2 * this.COLONY_BLINKS) &&
+            !!(colonyTicks % 2);
+
+        // Show an appropriate frame for each cell, start animations where
+        // necessary.
         for(var x = 0; x < SIZE_X; x++) {
             for(var y = 0; y < SIZE_Y; y++) {
-                var sprite = this.sprites[x * SIZE_Y + y];
+                // Get gameplay data for this cell
+                var isAlive = life.cellAt(x, y);
+                var wasAlive = life.oldCellAt(x, y);
                 var snakeKind = snake.segmentKindAt(x, y);
 
-                if(cherry.exists && cherry.x == x && cherry.y == y) {
-                    this.showFrame(sprite, this.CHERRY_FRAME);
-                } else if(snakeKind == snake.HEAD) {
+                // Visualize the cell depending on its gameplay state
+                var sprite = this.sprites[x * SIZE_Y + y];
+
+                // The snake
+                if(snakeKind == snake.HEAD) {
                     this.showFrame(sprite, this.HEAD_FRAME);
-                } else if(snakeKind == snake.TAIL) {
+                }
+                else if(snakeKind == snake.TAIL) {
                     this.showFrame(sprite, this.TAIL_FRAME);
-                } else if(snake.hadLoop && snake.loopClassAt(x, y) != snake.OUTSIDE) {
+                }
+                // Annihilated surrounded cells, if any
+                else if(snake.hadLoop && snake.loopClassAt(x, y) != snake.OUTSIDE) {
                     this.showAnimation(sprite, 'annihilate');
-                } else {
-                    this.showLifeSprite(sprite, x, y);
+                }
+                // Life cells, including those just born
+                else if(isAlive) {
+                    if(wasAlive) {
+                        this.showFrame(sprite, this.ALIVE_FRAME);
+                    } else {
+                        this.showAnimation(sprite, 'appear');
+                    }
+                }
+                // Colony preview, if any
+                else if(colonyVisible && colony.absoluteCellAt(x, y)) {
+                    this.showFrame(sprite, this.COLONY_FRAME);
+                }
+                // The cherry
+                else if(cherry.exists && cherry.x == x && cherry.y == y) {
+                    this.showFrame(sprite, this.CHERRY_FRAME);
+                }
+                // Empty cells where life just died
+                else if(wasAlive) {
+                    this.showAnimation(sprite, 'die');
+                }
+                // All other empty cells
+                else {
+                    sprite.visible = false;
                 }
             }
         }
@@ -401,104 +441,6 @@ var grid = {
         animation.restart();
         sprite.animations.play(name);
     },
-
-    showLifeSprite: function(sprite, x, y) {
-        var isAlive = life.cellAt(x, y);
-        var wasAlive = life.oldCellAt(x, y);
-
-        if(isAlive) {
-            if(wasAlive) {
-                this.showFrame(sprite, this.ALIVE_FRAME);
-            } else {
-                this.showAnimation(sprite, 'appear');
-            }
-        } else {
-            if(wasAlive) {
-                this.showAnimation(sprite, 'die');
-            } else {
-                sprite.visible = false;
-            }
-        }
-    }
-};
-
-// Visual representation of the colony to be spawned
-var colonyView = {
-    // Index of the "future colony" cell in the spritesheet
-    FRAME: 11,
-
-    // For how many ticks we show the future colony before it appears
-    BLINK_COUNT: 3,
-
-    // Whether we're showing the future colony at the moment
-    active: false,
-
-    // Pool for the sprites that we currently don't use
-    spritePool: null,
-
-    // The sprites that we use. Some of them are unused
-    sprites: [],
-
-    // The group for all the colony sprites
-    group: null,
-
-    createSprite: function() {
-        var sprite = this.group.create(0, 0, 'cell', 12, true);
-        sprite.frame = this.FRAME;
-        sprite.visible = false;
-        return sprite;
-    },
-
-    create: function() {
-        this.group = game.add.group();
-        this.spritePool = new ObjectPool(this.createSprite, this);
-    },
-
-    tick: function() {
-        // Decide if we should be showing the place of the future colony
-        // Stop showing in tick ``spawnTick'': in this tick the actual colony will
-        // already start showing.
-        var newActive = (currentTick >= colony.spawnTick - (2 * this.BLINK_COUNT)) &&
-            (currentTick < colony.spawnTick);
-
-        // Make the sprites visible/invisible
-        if(!this.active && newActive) {
-            this.createSprites();
-        } else if(this.active && !newActive) {
-            this.deleteSprites();
-        }
-        this.active = newActive;
-
-        // Blink if necessary
-        if(this.active) {
-            var visible = !!((colony.spawnTick - currentTick) % 2);
-            for(var i = 0; i < this.sprites.length; i++) {
-                this.sprites[i].visible = visible;
-            }
-        }
-    },
-
-    createSprites: function() {
-        for(var x = 0; x < colony.sizeX; x++) {
-            for(var y = 0; y < colony.sizeY; y++) {
-                if(colony.cellAt(x, y)) {
-                    var sprite = this.spritePool.allocate();
-                    sprite.x = FIELD_X + (colony.x + x) * CELL_SIZE;
-                    sprite.y = FIELD_Y + (colony.y + y) * CELL_SIZE;
-                    this.sprites.push(sprite);
-                }
-            }
-        }
-    },
-
-    deleteSprites: function() {
-        for(var i = 0; i < this.sprites.length; i++) {
-            this.sprites[i].visible = false;
-        }
-        this.sprites.length = 0;
-        // TODO: check that this doesn't lead to garbage collection
-    }
-
 };
 
 // Keyboard input queue
@@ -586,9 +528,19 @@ var colony = {
 
     // Colony cells
     // x, y: RELATIVE coordinates inside the colony
-    cellAt: function(x, y) {
+    cellAt: function(dx, dy) {
         // TODO: add real implementation
         return true;
+    },
+
+    // Like cellAt(), but x and y are ABSOLUTE coordinates
+    // of any point on the game field
+    absoluteCellAt: function(x, y) {
+        var dx = x - this.x;
+        var dy = y - this.y;
+        return (dx >= 0) && (dx < this.sizeX) &&
+            (dy >= 0) && (dy < this.sizeY) &&
+            this.cellAt(dx, dy);
     },
 
     // Choose a colony and determine when it will be spawned
@@ -622,7 +574,6 @@ function create() {
     // Create all the sprites
     game.add.sprite(0, 0, 'background');
     grid.create();
-    colonyView.create();
 
     // Launch the main timer to measure ticks by which Life & Snake live.
     game.time.events.loop(TICK_DELAY, tick);
@@ -670,7 +621,6 @@ function tick() {
 
     // Show what happened on the game field
     grid.tick();
-    colonyView.tick();
 
     // Keep track of time
     currentTick++;
