@@ -554,8 +554,10 @@ var colony = {
         // Choose a pattern at random
         var pattern = patterns[game.rnd.between(0, patterns.length - 1)];
 
-        // Copy the pattern to our memory
-        this.assignPattern(pattern);
+        // Copy the pattern to our memory, and apply a random
+        // rotation/reflection.
+        var matrix = Matrix2.d8element(game.rnd.between(0, 3), game.rnd.between(0, 1));
+        this.assignPattern(pattern, matrix);
 
         // Choose the spawn position on the field
         this.x = game.rnd.between(0, SIZE_X - this.sizeX);
@@ -566,10 +568,24 @@ var colony = {
     },
 
     // Set the pattern that the colony will use
-    assignPattern: function(pattern) {
+    assignPattern: function(pattern, mat) {
+        // Original indices lie on the grid between (0, 0) and (cx, cy) inclusive
+        var cx = pattern.sizeX - 1;
+        var cy = pattern.sizeY - 1;
+
+        // Move this grid using the matrix. This is linear, i.e. (0, 0) rests
+        // on its place and (cx, cy) can go into any coordinate quadrant.
+        var newCx = mat.getX(cx, cy);
+        var newCy = mat.getY(cx, cy);
+
+        // Determine additional shift that is needed to bring the transformed
+        // rectangle back to the positive quadrant, with one corner at (0, 0)
+        var deltaX = (newCx >= 0) ? 0 : -newCx;
+        var deltaY = (newCy >= 0) ? 0 : -newCy;
+
         // Remember the size
-        this.sizeX = pattern.sizeX;
-        this.sizeY = pattern.sizeY;
+        this.sizeX = Math.abs(newCx) + 1;
+        this.sizeY = Math.abs(newCy) + 1;
 
         // Allocate more memory if needed
         if(this.cells.length < this.sizeX * this.sizeY) {
@@ -577,9 +593,10 @@ var colony = {
         }
 
         // Copy the data
-        for(var dx = 0; dx < this.sizeX; dx++) {
-            for(var dy = 0; dy < this.sizeY; dy++) {
-                this.setCellAt(dx, dy, pattern.cellAt(dx, dy));
+        for(var x = 0; x < pattern.sizeX; x++) {
+            for(var y = 0; y < pattern.sizeY; y++) {
+                this.setCellAt(deltaX + mat.getX(x, y), deltaY + mat.getY(x, y),
+                    pattern.cellAt(x, y));
             }
         }
     }
@@ -599,6 +616,8 @@ function create() {
     // Initialize state of the game
     life.create();
     colony.generate();
+    colony.spawnTick = 20;
+
     snake.create();
     maybeSpawnCherry();
 
