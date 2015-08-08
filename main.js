@@ -648,20 +648,21 @@ function inBounds(x, y) {
     return (x >= 0) && (y >= 0) && (x < SIZE_X) && (y < SIZE_Y);
 }
 
-var gameState = {
+var bootState = {
     preload: function() {
         game.load.spritesheet('cell', 'assets/cells.png', 12, 12);
         game.load.image('background', 'assets/background.png');
     },
 
     create: function() {
-        // Initialize state of the game
-        life.create();
-        colony.generate();
-        colony.spawnTick = 20;
+        game.state.start('game');
+    }
+};
 
-        snake.create();
-        this.maybeSpawnCherry();
+var gameState = {
+    create: function() {
+        // Initialize state of the game
+        this.initGameState();
 
         // Prepare to accept user input
         inputQueue.create();
@@ -672,6 +673,17 @@ var gameState = {
 
         // Launch the main timer to measure ticks by which Life & Snake live.
         game.time.events.loop(TICK_DELAY, this.tick, this);
+    },
+
+    // Initializes game state. If a game is already in progress, this will
+    // have the effect of aborting it and starting a fresh one.
+    initGameState: function() {
+        life.create();
+        colony.generate();
+        colony.spawnTick = currentTick + 20;
+
+        snake.create();
+        this.maybeSpawnCherry();
     },
 
     tick: function() {
@@ -709,13 +721,6 @@ var gameState = {
             }
         }
 
-        // Restart everything when we die
-        if(!inBounds(snake.headX, snake.headY) ||
-                life.cellAt(snake.headX, snake.headY))
-        {
-            game.state.start('game');
-        }
-
         // Respawn the cherry if it was eaten/destroyed
         if(!cherry.exists) {
             this.maybeSpawnCherry();
@@ -726,6 +731,14 @@ var gameState = {
 
         // Keep track of time
         currentTick++;
+
+        // Restart everything when we die
+        if(!inBounds(snake.headX, snake.headY) ||
+                life.cellAt(snake.headX, snake.headY))
+        {
+            this.initGameState();
+        }
+
     },
 
     maybeSpawnCherry: function() {
@@ -739,5 +752,10 @@ var gameState = {
 
 // Tell Phaser to launch the game
 var game = new Phaser.Game(640, 480, Phaser.AUTO, '');
+game.state.add('boot', bootState);
 game.state.add('game', gameState);
-game.state.start('game');
+game.state.start('boot');
+
+// TODO: maybe make Life 2 times slower? Otherwise a cell blinking with period 2
+// will be either lethal or not depending on whether it was born in an odd/even tick,
+// because it always takes an even number of ticks for the snake to make a loop.
