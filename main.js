@@ -370,10 +370,17 @@ var snake = {
 var grid = {
     // Indices of various frames in the spritesheet
     ALIVE_FRAME: 0,   // A Life cell
-    HEAD_FRAME: 4,    // The snake's head
-    TAIL_FRAME: 5,    // The snake's body segment
-    CHERRY_FRAME: 10,
-    COLONY_FRAME: 11, // Cell of a Life colony to be spawned
+    CHERRY_FRAME: 9,
+    COLONY_FRAME: 10, // Cell of a Life colony to be spawned
+    HTAIL_FRAME: 8,   // The entire snake when it has length 1
+
+    // Indices of snake parts. Each index marks a group of 4
+    // variants of the same part facing in different directions.
+    HEAD_FRAMES: 12,
+    TAIL_FRAMES: 16,
+    MIDDLE_FRAMES: 20,
+    CORNER_LEFT_FRAMES: 24,
+    CORNER_RIGHT_FRAMES: 28,
 
     // How many times a colony preview blinks before the colony appears
     COLONY_BLINKS: 3,
@@ -392,7 +399,7 @@ var grid = {
                         'cell');
                 sprite.animations.add('die', [0, 1, 2, 3], 3 * 1000.0 / TICK_DELAY, false);
                 sprite.animations.add('appear', [3, 2, 1, 0], 3 * 1000.0 / TICK_DELAY, false);
-                sprite.animations.add('annihilate', [6, 7, 8, 9], 4 * 1000.0 / TICK_DELAY, false);
+                sprite.animations.add('annihilate', [4, 5, 6, 7], 4 * 1000.0 / TICK_DELAY, false);
                 sprite.visible = false;
                 this.sprites.push(sprite);
             }
@@ -421,10 +428,10 @@ var grid = {
 
                 // The snake
                 if(snakeKind == snake.HEAD) {
-                    this.showFrame(sprite, this.HEAD_FRAME);
+                    this.showFrame(sprite, this.HTAIL_FRAME);
                 }
                 else if(snakeKind == snake.TAIL) {
-                    this.showFrame(sprite, this.TAIL_FRAME);
+                    this.showFrame(sprite, this.HTAIL_FRAME);
                 }
                 // Annihilated surrounded cells, if any
                 else if(snake.hadLoop && snake.loopClassAt(x, y) != snake.OUTSIDE) {
