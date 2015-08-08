@@ -553,6 +553,9 @@ var cherry = {
 
 // Next Life colony that is about to be spawned
 var colony = {
+    // How many ticks between game start and first colony spawn
+    FIRST_DELAY: 20,
+
     // How many ticks pass between colony spawns
     SPAWN_DELAY: SIZE_X + SIZE_Y,
 
@@ -603,9 +606,6 @@ var colony = {
         // Choose the spawn position on the field
         this.x = game.rnd.between(1, SIZE_X - 1 - this.sizeX);
         this.y = game.rnd.between(1, SIZE_Y - 1 - this.sizeY);
-
-        // Schedule spawn time
-        this.spawnTick = currentTick + this.SPAWN_DELAY;
     },
 
     // Set the pattern that the colony will use
@@ -680,7 +680,7 @@ var gameState = {
     initGameState: function() {
         life.create();
         colony.generate();
-        colony.spawnTick = currentTick + 20;
+        colony.spawnTick = currentTick + colony.FIRST_DELAY;
 
         snake.create();
         this.maybeSpawnCherry();
@@ -694,6 +694,7 @@ var gameState = {
         if(currentTick >= colony.spawnTick) {
             life.add(colony.x, colony.y, colony);
             colony.generate();
+            colony.spawnTick = currentTick + colony.SPAWN_DELAY;
         }
 
         // Destroy the cherry if life crept on it
