@@ -34,8 +34,14 @@ var life = {
     // Values of cells in the previous tick
     oldCells: [],
 
-    // Convenience functions to access these arrays
+    // One-time initialization
+    initialize: function() {
+        this.cells.length = SIZE_X * SIZE_Y;
+        this.oldCells.length = SIZE_X * SIZE_Y;
+        return this;
+    },
 
+    // Convenience functions to access cell states
     cellAt: function(x, y) {
         return this.cells[x * SIZE_Y + y];
     },
@@ -48,14 +54,12 @@ var life = {
         return this.oldCells[x * SIZE_Y + y];
     },
 
-    // Initialize Life
+    // Called each time the user starts a new game
     create: function() {
-        for(var x = 0; x < SIZE_X; x++) {
-            for(var y = 0; y < SIZE_Y; y++) {
-                // Initialize cells with random values
-                this.cells.push(false);
-                this.oldCells.push(false);
-            }
+        // Clear the field
+        for(var i = 0; i < SIZE_X * SIZE_Y; i++) {
+            this.cells[i] = false;
+            this.oldCells[i] = false;
         }
     },
 
@@ -107,11 +111,16 @@ var life = {
         }
     }
 
-};
+}.initialize();
 
 var snake = {
-    // Minimal allowed (desired) length of the snake
+    // Minimal allowed length of the snake
     MIN_LENGTH: 3,
+
+    // Length of the snake (desired) when the game starts. The nake will be
+    // born with length 1 and immediately start growing until the length
+    // reaches this value.
+    START_LENGTH: 15,
 
     // Classification of field cells w.r.t. the snake
     FREE: -1, // "Snake isn't over this cell"
@@ -124,13 +133,13 @@ var snake = {
     BORDER: -6,
 
     // Head position and movement direction
-    headX: Math.round(SIZE_X / 2),
-    headY: Math.round(SIZE_Y / 2),
+    headX: 0,
+    headY: 0,
     headDir: directions.UP,
 
     // The desired length of the snake. Can be larger than the actual length,
     // in which case the snake will steadily grow.
-    desiredLength: 15,
+    desiredLength: 0,
 
     // Circular buffer for the tail segments
     tail: [],
@@ -147,6 +156,43 @@ var snake = {
 
     // The class of each cell w.r.t. the last loop made by the snake
     loopClasses: [],
+
+    // One-time initialization
+    initialize: function() {
+        // Allocate all the memory
+        this.tail.length = SIZE_X * SIZE_Y + 1;
+        for(var i = 0; i < this.tail.length; i++) {
+            this.tail[i] = { x: 0, y: 0 };
+        }
+
+        this.tailIndices.length = SIZE_X * SIZE_Y;
+        this.loopClasses.length = SIZE_X * SIZE_Y;
+
+        return this;
+    },
+
+    // Initialize the snake. Called every time the user starts a new game.
+    create: function() {
+        // Place ourselves on the center of the field, looking up
+        this.headX = Math.round(SIZE_X / 2);
+        this.headY = Math.round(SIZE_Y / 2),
+        this.headDir = directions.UP,
+
+        // Start growing
+        this.desiredLength = this.START_LENGTH;
+
+        // Clear the circular buffer representing our tail
+        this.tailIn = 0;
+        this.tailOut = 0;
+
+        // Remember that our tail doesn't occupy any cells on the field
+        for(var i = 0; i < this.tailIndices.length; i++) {
+            this.tailIndices[i] = this.FREE;
+        }
+
+        // Reset other misc. data
+        this.hadLoop = false;
+    },
 
     // Add new tail segment
     pushSegment: function(x, y) {
@@ -199,24 +245,6 @@ var snake = {
 
     setLoopClassAt: function(x, y, val) {
         this.loopClasses[x * SIZE_Y + y] = val;
-    },
-
-    // Initialize the structure: empty snake (only the head) in the center
-    // of the screen
-    create: function() {
-        for(var i = 0; i < SIZE_X * SIZE_Y + 1; i++) {
-            this.tail.push({
-                x: 0,
-                y: 0
-            });
-        }
-
-        for(var x = 0; x < SIZE_X; x++) {
-            for(var y = 0; y < SIZE_Y; y++) {
-                this.tailIndices.push(this.FREE);
-                this.loopClasses.push(this.OUTSIDE);
-            }
-        }
     },
 
     // Advance the snake one step further
@@ -334,25 +362,29 @@ var snake = {
         }
     }
 
-}; // var snake = {...}
+}.initialize(); // var snake = {...}
 
 
 // The SIZE_X * SIZE_Y grid of sprites to display the game field.
 // This includes the Life cells and the snake's tail.
 var grid = {
+    // Indices of various frames in the spritesheet
     ALIVE_FRAME: 0,   // A Life cell
     HEAD_FRAME: 4,    // The snake's head
     TAIL_FRAME: 5,    // The snake's body segment
     CHERRY_FRAME: 10,
     COLONY_FRAME: 11, // Cell of a Life colony to be spawned
 
-    COLONY_BLINKS: 3, // How many times a colony preview blinks before the colony appears
+    // How many times a colony preview blinks before the colony appears
+    COLONY_BLINKS: 3,
 
     // One sprite for each grid cell
     sprites: [],
 
+    // Initialization. Called at the start of each new game
     create: function() {
         var grp = game.add.spriteBatch();
+        this.sprites = []; // TODO: reuse sprites between game sessions
 
         for(var x = 0; x < SIZE_X; x++) {
             for(var y = 0; y < SIZE_Y; y++) {
@@ -449,6 +481,33 @@ var inputQueue = {
     queueIn: 0,
     queueOut: 0,
 
+    // Phaser's cursor object
+    cursor: null,
+
+    // One-time initialization
+    initialize: function() {
+        // Allocate the buffer
+        this.queue.length = this.MAX_LENGTH + 1;
+        return this;
+    },
+
+    // Called each time a new game starts
+    create: function() {
+        // Empty the buffer
+        this.queueIn = 0;
+        this.queueOut = 0;
+
+        // Subscribe to keyboard events
+        // (only do it when walled for the first time)
+        if(!this.cursor) {
+            this.cursor = game.input.keyboard.createCursorKeys();
+            this.cursor.down.onDown.add(this.onCursorKey, this);
+            this.cursor.up.onDown.add(this.onCursorKey, this);
+            this.cursor.right.onDown.add(this.onCursorKey, this);
+            this.cursor.left.onDown.add(this.onCursorKey, this);
+        }
+    },
+
     // Find out how many keys are in the queue
     length: function() {
         return (this.queueIn - this.queueOut + this.queue.length) % this.queue.length;
@@ -474,20 +533,7 @@ var inputQueue = {
         }
     },
 
-    create: function() {
-        // Initialize the circular buffer
-        for(var i = 0; i < this.MAX_LENGTH; i++) {
-            this.queue.push(directions.UP);
-        }
-
-        // Subscribe to keyboard events
-        this.cursor = game.input.keyboard.createCursorKeys();
-        this.cursor.down.onDown.add(this.onCursorKey, this);
-        this.cursor.up.onDown.add(this.onCursorKey, this);
-        this.cursor.right.onDown.add(this.onCursorKey, this);
-        this.cursor.left.onDown.add(this.onCursorKey, this);
-    },
-
+    // Called each time the user prersses a key
     onCursorKey: function(key) {
         var dir = (key === this.cursor.down) ? directions.DOWN:
             (key === this.cursor.up) ? directions.UP:
@@ -498,7 +544,8 @@ var inputQueue = {
             this.maybePush(dir);
         }
     }
-};
+
+}.initialize();
 
 // The cherry that can be eaten for growth
 var cherry = {
@@ -520,8 +567,8 @@ var colony = {
     y: 0,
 
     // Size of the colony
-    sizeX: 2,
-    sizeY: 2,
+    sizeX: 0,
+    sizeY: 0,
 
     // Colony cells as a boolean array
     cells: [],
@@ -695,9 +742,5 @@ var gameState = {
 
 // Tell Phaser to launch the game
 var game = new Phaser.Game(640, 480, Phaser.AUTO, '');
-
 game.state.add('game', gameState);
 game.state.start('game');
-
-
-// TODO: when allocating arrays, set length directly instead of using pushes
