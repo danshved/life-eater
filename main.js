@@ -1,6 +1,3 @@
-var game = new Phaser.Game(640, 480, Phaser.AUTO, '',
-    { preload: preload, create: create});
-
 // Top-left corner of the game field
 var FIELD_X = 14;
 var FIELD_Y = 12;
@@ -268,7 +265,7 @@ var snake = {
         // Remove the looping part, i.e. all cells between the head (exclusive)
         // and the bitten segment (inclusive)
         for(var index = biteIndex; index != this.tailIn;
-            index = (index + 1) % this.tail.length)
+                index = (index + 1) % this.tail.length)
         {
             var segment = this.tail[index];
             this.setTailIndexAt(segment.x, segment.y, this.FREE);
@@ -360,7 +357,7 @@ var grid = {
         for(var x = 0; x < SIZE_X; x++) {
             for(var y = 0; y < SIZE_Y; y++) {
                 var sprite = grp.create(FIELD_X + CELL_SIZE * x, FIELD_Y + CELL_SIZE * y,
-                    'cell');
+                        'cell');
                 sprite.animations.add('die', [0, 1, 2, 3], 9, false);
                 sprite.animations.add('appear', [3, 2, 1, 0], 9, false);
                 sprite.animations.add('annihilate', [6, 7, 8, 9], 12, false);
@@ -596,7 +593,7 @@ var colony = {
         for(var x = 0; x < pattern.sizeX; x++) {
             for(var y = 0; y < pattern.sizeY; y++) {
                 this.setCellAt(deltaX + mat.getX(x, y), deltaY + mat.getY(x, y),
-                    pattern.cellAt(x, y));
+                        pattern.cellAt(x, y));
             }
         }
     }
@@ -607,83 +604,100 @@ function inBounds(x, y) {
     return (x >= 0) && (y >= 0) && (x < SIZE_X) && (y < SIZE_Y);
 }
 
-function preload() {
-    game.load.spritesheet('cell', 'assets/cells.png', 12, 12);
-    game.load.image('background', 'assets/background.png');
-}
+var gameState = {
+    preload: function() {
+        game.load.spritesheet('cell', 'assets/cells.png', 12, 12);
+        game.load.image('background', 'assets/background.png');
+    },
 
-function create() {
-    // Initialize state of the game
-    life.create();
-    colony.generate();
-    colony.spawnTick = 20;
-
-    snake.create();
-    maybeSpawnCherry();
-
-    // Prepare to accept user input
-    inputQueue.create();
-
-    // Create all the sprites
-    game.add.sprite(0, 0, 'background');
-    grid.create();
-
-    // Launch the main timer to measure ticks by which Life & Snake live.
-    game.time.events.loop(TICK_DELAY, tick);
-}
-
-function tick() {
-    // Make a step in the Game of Life
-    life.tick();
-
-    // Drop a new Life colony if it's time
-    if(currentTick >= colony.spawnTick) {
-        life.add(colony.x, colony.y, colony);
+    create: function() {
+        // Initialize state of the game
+        life.create();
         colony.generate();
-    }
+        colony.spawnTick = 20;
 
-    // Destroy the cherry if life crept on it
-    if(cherry.exists && life.cellAt(cherry.x, cherry.y)) {
-        cherry.exists = false;
-    }
+        snake.create();
+        this.maybeSpawnCherry();
 
-    // Make a snake's step, turning if there was user input
-    snake.tick(inputQueue.maybePop());
+        // Prepare to accept user input
+        inputQueue.create();
 
-    // Snake grows when it eats the cherry
-    if(cherry.exists && cherry.x == snake.headX && cherry.y == snake.headY) {
-        cherry.exists = false;
-        snake.desiredLength++;
-    }
+        // Create all the sprites
+        game.add.sprite(0, 0, 'background');
+        grid.create();
 
-    // If the snake surrounded something, destroy all Life there
-    if(snake.hadLoop) {
-        for(var x = 0; x < SIZE_X; x++) {
-            for(var y = 0; y < SIZE_Y; y++) {
-                if(snake.loopClassAt(x, y) != snake.OUTSIDE) {
-                    life.setCellAt(x, y, false);
+        // Launch the main timer to measure ticks by which Life & Snake live.
+        game.time.events.loop(TICK_DELAY, this.tick, this);
+    },
+
+    tick: function() {
+        // Make a step in the Game of Life
+        life.tick();
+
+        // Drop a new Life colony if it's time
+        if(currentTick >= colony.spawnTick) {
+            life.add(colony.x, colony.y, colony);
+            colony.generate();
+        }
+
+        // Destroy the cherry if life crept on it
+        if(cherry.exists && life.cellAt(cherry.x, cherry.y)) {
+            cherry.exists = false;
+        }
+
+        // Make a snake's step, turning if there was user input
+        snake.tick(inputQueue.maybePop());
+
+        // Snake grows when it eats the cherry
+        if(cherry.exists && cherry.x == snake.headX && cherry.y == snake.headY) {
+            cherry.exists = false;
+            snake.desiredLength++;
+        }
+
+        // If the snake surrounded something, destroy all Life there
+        if(snake.hadLoop) {
+            for(var x = 0; x < SIZE_X; x++) {
+                for(var y = 0; y < SIZE_Y; y++) {
+                    if(snake.loopClassAt(x, y) != snake.OUTSIDE) {
+                        life.setCellAt(x, y, false);
+                    }
                 }
             }
         }
+
+        // Restart everything when we die
+        if(!inBounds(snake.headX, snake.headY) ||
+                life.cellAt(snake.headX, snake.headY))
+        {
+            // game.state.start('game');
+        }
+
+        // Respawn the cherry if it was eaten/destroyed
+        if(!cherry.exists) {
+            this.maybeSpawnCherry();
+        }
+
+        // Show what happened on the game field
+        grid.tick();
+
+        // Keep track of time
+        currentTick++;
+    },
+
+    maybeSpawnCherry: function() {
+        cherry.x = game.rnd.between(0, SIZE_X - 1);
+        cherry.y = game.rnd.between(0, SIZE_Y - 1);
+        cherry.exists = !life.cellAt(cherry.x, cherry.y) &&
+            (snake.segmentKindAt(cherry.x, cherry.y) == snake.FREE);
     }
 
-    // Respawn the cherry if it was eaten/destroyed
-    if(!cherry.exists) {
-        maybeSpawnCherry();
-    }
-
-    // Show what happened on the game field
-    grid.tick();
-
-    // Keep track of time
-    currentTick++;
 }
 
-function maybeSpawnCherry() {
-    cherry.x = game.rnd.between(0, SIZE_X - 1);
-    cherry.y = game.rnd.between(0, SIZE_Y - 1);
-    cherry.exists = !life.cellAt(cherry.x, cherry.y) &&
-        (snake.segmentKindAt(cherry.x, cherry.y) == snake.FREE);
-}
+// Tell Phaser to launch the game
+var game = new Phaser.Game(640, 480, Phaser.AUTO, '');
+
+game.state.add('game', gameState);
+game.state.start('game');
+
 
 // TODO: when allocating arrays, set length directly instead of using pushes
