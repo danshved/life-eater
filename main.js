@@ -384,7 +384,7 @@ var grid = {
     // Initialization. Called at the start of each new game
     create: function() {
         var grp = game.add.spriteBatch();
-        this.sprites = []; // TODO: reuse sprites between game sessions
+        this.sprites = []; // TODO: reuse sprites between game sessions?
 
         for(var x = 0; x < SIZE_X; x++) {
             for(var y = 0; y < SIZE_Y; y++) {
@@ -498,14 +498,11 @@ var inputQueue = {
         this.queueOut = 0;
 
         // Subscribe to keyboard events
-        // (only do it when walled for the first time)
-        if(!this.cursor) {
-            this.cursor = game.input.keyboard.createCursorKeys();
-            this.cursor.down.onDown.add(this.onCursorKey, this);
-            this.cursor.up.onDown.add(this.onCursorKey, this);
-            this.cursor.right.onDown.add(this.onCursorKey, this);
-            this.cursor.left.onDown.add(this.onCursorKey, this);
-        }
+        this.cursor = game.input.keyboard.createCursorKeys();
+        this.cursor.down.onDown.add(this.onCursorKey, this);
+        this.cursor.up.onDown.add(this.onCursorKey, this);
+        this.cursor.right.onDown.add(this.onCursorKey, this);
+        this.cursor.left.onDown.add(this.onCursorKey, this);
     },
 
     // Find out how many keys are in the queue
@@ -716,7 +713,7 @@ var gameState = {
         if(!inBounds(snake.headX, snake.headY) ||
                 life.cellAt(snake.headX, snake.headY))
         {
-            // game.state.start('game');
+            game.state.start('game');
         }
 
         // Respawn the cherry if it was eaten/destroyed
