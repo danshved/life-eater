@@ -10,7 +10,7 @@ var SIZE_X = 51;
 var SIZE_Y = 38;
 
 // Delay between life ticks, in milliseconds
-var TICK_DELAY = 200;
+var TICK_DELAY = 150;
 
 // Constants to operate with the 4 directions
 var directions = {
@@ -390,9 +390,9 @@ var grid = {
             for(var y = 0; y < SIZE_Y; y++) {
                 var sprite = grp.create(FIELD_X + CELL_SIZE * x, FIELD_Y + CELL_SIZE * y,
                         'cell');
-                sprite.animations.add('die', [0, 1, 2, 3], 9, false);
-                sprite.animations.add('appear', [3, 2, 1, 0], 9, false);
-                sprite.animations.add('annihilate', [6, 7, 8, 9], 12, false);
+                sprite.animations.add('die', [0, 1, 2, 3], 3 * 1000.0 / TICK_DELAY, false);
+                sprite.animations.add('appear', [3, 2, 1, 0], 3 * 1000.0 / TICK_DELAY, false);
+                sprite.animations.add('annihilate', [6, 7, 8, 9], 4 * 1000.0 / TICK_DELAY, false);
                 sprite.visible = false;
                 this.sprites.push(sprite);
             }
