@@ -1,13 +1,13 @@
 // Top-left corner of the game field
 var FIELD_X = 14;
-var FIELD_Y = 12;
+var FIELD_Y = 36;
 
 // Size of a cell on the game field (cells are squares)
 var CELL_SIZE = 12;
 
 // Field size, in cells
 var SIZE_X = 51;
-var SIZE_Y = 38;
+var SIZE_Y = 36;
 
 // Delay between life ticks, in milliseconds
 var TICK_DELAY = 150;
