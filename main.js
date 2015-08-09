@@ -32,6 +32,9 @@ var directions = {
 // Current tick number
 var currentTick = 0;
 
+// Current score
+var score = 0;
+
 // Game of Life field (the logical part, not the visualization)
 var life = {
     // SIZE_X * SIZE_Y booleans. true/false = alive/dead cell.
@@ -406,10 +409,10 @@ var grid = {
     // One sprite for each grid cell
     sprites: [],
 
-    // Initialization. Called at the start of each new game
+    // Initialization. Called once when 'game' state is entered.
     create: function() {
         var grp = game.add.spriteBatch();
-        this.sprites = []; // TODO: reuse sprites between game sessions?
+        this.sprites = [];
 
         for(var x = 0; x < SIZE_X; x++) {
             for(var y = 0; y < SIZE_Y; y++) {
@@ -555,7 +558,7 @@ var inputQueue = {
         return this;
     },
 
-    // Called each time a new game starts
+    // Called once when entering the 'game' state
     create: function() {
         // Empty the buffer
         this.queueIn = 0;
@@ -707,6 +710,44 @@ var colony = {
     }
 };
 
+// Text objects storing the current score etc.
+var hud = {
+    // Y coordinate of the text (vertical anchor is text center)
+    Y: 16,
+
+    // Gap between pictograms and neighboring text
+    X_GAP: 3,
+
+    scoreText: null,
+    lengthText: null,
+
+    // Initialization
+    // Called once when entering the 'game' state
+    create: function() {
+        // Snake length display
+        this.lengthText = game.add.text(42 + this.X_GAP, this.Y, '0');
+        this.lengthText.anchor.set(0.0, 0.5);
+        this.lengthText.text = snake.START_LENGTH;
+        this.setCommonParams(this.lengthText);
+
+        // Score display
+        this.scoreText = game.add.text(game.width - 42 - this.X_GAP, this.Y, '0');
+        this.scoreText.anchor.set(1.0, 0.5);
+        this.setCommonParams(this.scoreText);
+    },
+
+    // Initialization done for every text object
+    setCommonParams: function(obj) {
+        // obj.fill = '#ff5500';    // color of the cherry
+        obj.fill = 'white';
+    },
+
+    tick: function() {
+        this.lengthText.text = snake.desiredLength;
+        this.scoreText.text = score;
+    }
+};
+
 // Checks whether the given coordinates are in the field's boundaries
 function inBounds(x, y) {
     return (x >= 0) && (y >= 0) && (x < SIZE_X) && (y < SIZE_Y);
@@ -731,9 +772,10 @@ var gameState = {
         // Prepare to accept user input
         inputQueue.create();
 
-        // Create all the sprites
+        // Create all the Phaser objects
         game.add.sprite(0, 0, 'background');
         grid.create();
+        hud.create();
 
         // Launch the main timer to measure ticks by which Life & Snake live.
         game.time.events.loop(TICK_DELAY, this.tick, this);
@@ -742,9 +784,12 @@ var gameState = {
     // Initializes game state. If a game is already in progress, this will
     // have the effect of aborting it and starting a fresh one.
     initGameState: function() {
+        currentTick = 0;
+        score = 0;
+
         life.create();
         colony.generate();
-        colony.spawnTick = currentTick + colony.FIRST_DELAY;
+        colony.spawnTick = colony.FIRST_DELAY;
 
         snake.create();
         this.maybeSpawnCherry();
@@ -779,7 +824,15 @@ var gameState = {
         if(snake.hadLoop) {
             for(var x = 0; x < SIZE_X; x++) {
                 for(var y = 0; y < SIZE_Y; y++) {
-                    if(snake.loopClassAt(x, y) != snake.OUTSIDE) {
+                    var situation = snake.loopClassAt(x, y);
+
+                    // Get points for all the life strictly inside the loop
+                    if(situation == snake.INSIDE && life.cellAt(x, y)) {
+                        score++;
+                    }
+
+                    // Destroy life inside and on the loop
+                    if(situation != snake.OUTSIDE) {
                         life.setCellAt(x, y, false);
                     }
                 }
@@ -793,6 +846,9 @@ var gameState = {
 
         // Show what happened on the game field
         grid.tick();
+
+        // Update the HUD text
+        hud.tick();
 
         // Keep track of time
         currentTick++;
