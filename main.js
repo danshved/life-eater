@@ -388,17 +388,17 @@ var snake = {
 var grid = {
     // Indices of various frames in the spritesheet
     ALIVE_FRAME: 0,   // A Life cell
-    CHERRY_FRAME: 9,
-    COLONY_FRAME: 10, // Cell of a Life colony to be spawned
-    HTAIL_FRAME: 8,   // The entire snake when it has length 1
+    CHERRY_FRAME: 7,
+    COLONY_FRAME: 14, // Cell of a Life colony to be spawned
+    HTAIL_FRAME: 6,   // The entire snake when it has length 1
 
     // Indices of snake parts. Each index marks a group of 4
     // variants of the same part facing in different directions.
-    HEAD_FRAMES: 12,
-    TAIL_FRAMES: 16,
-    MIDDLE_FRAMES: 20,
-    CORNER_LEFT_FRAMES: 24,
-    CORNER_RIGHT_FRAMES: 28,
+    HEAD_FRAMES: 16,
+    TAIL_FRAMES: 20,
+    MIDDLE_FRAMES: 24,
+    CORNER_LEFT_FRAMES: 28,
+    CORNER_RIGHT_FRAMES: 32,
 
     // How many times a colony preview blinks before the colony appears
     COLONY_BLINKS: 3,
@@ -415,9 +415,9 @@ var grid = {
             for(var y = 0; y < SIZE_Y; y++) {
                 var sprite = grp.create(FIELD_X + CELL_SIZE * x, FIELD_Y + CELL_SIZE * y,
                         'cell');
-                sprite.animations.add('die', [0, 1, 2, 3], 9, false);
-                sprite.animations.add('appear', [3, 2, 1, 0], 9, false);
-                sprite.animations.add('annihilate', [4, 5, 6, 7], 12, false);
+                sprite.animations.add('die', [0, 1, 2, 3, 4, 5], 18, false);
+                sprite.animations.add('appear', [5, 4, 3, 2, 1, 0], 18, false);
+                sprite.animations.add('annihilate', [8, 9, 10, 11, 12, 13], 24, false);
                 sprite.visible = false;
                 this.sprites.push(sprite);
             }
