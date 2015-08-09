@@ -20,7 +20,13 @@ var directions = {
     UP: 3,
 
     dx: [1, 0, -1, 0],
-    dy: [0, 1, 0, -1]
+    dy: [0, 1, 0, -1],
+
+    get: function(x1, y1, x2, y2) {
+        return (x2 == x1 + 1) ? this.RIGHT :
+            (x2 == x1 - 1) ? this.LEFT :
+            (y2 == y1 + 1) ? this.DOWN : this.UP;
+    }
 };
 
 // Current tick number
@@ -124,17 +130,14 @@ var snake = {
 
     // Classification of field cells w.r.t. the snake
     FREE: -1, // "Snake isn't over this cell"
-    HEAD: -2, // "Snake's head is in this cell"
-    TAIL: -3, // "Snake's non-head segment is in this cell"
 
     // Classification of field cells w.r.t. the surrounding made by the snake
-    INSIDE: -4,
-    OUTSIDE: -5,
-    BORDER: -6,
+    INSIDE: -2,
+    OUTSIDE: -3,
+    BORDER: -4,
 
     // Head position and movement direction
-    headX: 0,
-    headY: 0,
+    head: { x : 0, y : 0 },
     headDir: directions.UP,
 
     // The desired length of the snake. Can be larger than the actual length,
@@ -174,8 +177,8 @@ var snake = {
     // Initialize the snake. Called every time the user starts a new game.
     create: function() {
         // Place ourselves on the center of the field, looking up
-        this.headX = Math.round(SIZE_X / 2);
-        this.headY = Math.round(SIZE_Y / 2),
+        this.head.x = Math.round(SIZE_X / 2);
+        this.head.y = Math.round(SIZE_Y / 2),
         this.headDir = directions.UP,
 
         // Start growing
@@ -194,8 +197,37 @@ var snake = {
         this.hadLoop = false;
     },
 
+    // Returns the snake's length, head included
+    length: function() {
+        return (this.tailIn - this.tailOut + this.tail.length)
+            % this.tail.length + 1;
+    },
+
+    // Return the (x, y) coordinates of a cell with given index,
+    // 0 being the head and length() - 1 being the end of the tail.
+    posByIndex: function(index) {
+        return (index == 0) ? this.head :
+            this.tail[(this.tailIn - index + this.tail.length) % this.tail.length];
+    },
+
+    // Returns the index of a snake cell with given coordinates, or FREE
+    // if the snake isn't over the cell
+    indexAt: function(x, y) {
+        if(x == this.head.x && y == this.head.y) {
+            return 0;
+        } else {
+            // Get the index in the circular buffer
+            var tailIndex = this.tailIndexAt(x, y);
+            if(tailIndex == this.FREE) {
+                return this.FREE;
+            } else {
+                return (this.tailIn - tailIndex + this.tail.length) % this.tail.length;
+            }
+        }
+    },
+
     // Add new tail segment
-    pushSegment: function(x, y) {
+    pushTail: function(x, y) {
         // Store the index of the new segment
         this.setTailIndexAt(x, y, this.tailIn);
 
@@ -206,19 +238,13 @@ var snake = {
     },
 
     // Remove the last tail segment (FIFO)
-    popSegment: function() {
+    popTail: function() {
         // Remember that this cell is free now
         var segment = this.tail[this.tailOut];
         this.setTailIndexAt(segment.x, segment.y, this.FREE);
 
         // Remove tail segment from the circular buffer
         this.tailOut = (this.tailOut + 1) % this.tail.length;
-    },
-
-    // Returns the snake's length, head included
-    length: function() {
-        return (this.tailIn - this.tailOut + this.tail.length)
-            % this.tail.length + 1;
     },
 
     // Returns the index of tail segment in the given cell.
@@ -230,12 +256,6 @@ var snake = {
     // Set the index of tail segment in the given cell
     setTailIndexAt: function(x, y, val) {
         this.tailIndices[x * SIZE_Y + y] = val;
-    },
-
-    // Returns which part of snake is over the given cell: head, tail segment, or nothing
-    segmentKindAt: function(x, y) {
-        return (x == this.headX && y == this.headY) ? this.HEAD :
-            (this.tailIndexAt(x, y) == this.FREE) ? this.FREE : this.TAIL;
     },
 
     // Get/set the loop class of the given cell
@@ -254,17 +274,15 @@ var snake = {
             this.headDir = direction;
         }
 
-        // Advance the tail
-        this.pushSegment(this.headX, this.headY);
+        // Move the head forward and grow 1 unit
+        this.pushTail(this.head.x, this.head.y);
+        this.head.x += directions.dx[this.headDir];
+        this.head.y += directions.dy[this.headDir];
 
         // Don't let length exceed the desired value
         if(this.length() > this.desiredLength) {
-            this.popSegment();
+            this.popTail();
         }
-
-        // Move the head
-        this.headX += directions.dx[this.headDir];
-        this.headY += directions.dy[this.headDir];
 
         // Detect if we've made a loop
         this.checkLoop();
@@ -275,12 +293,12 @@ var snake = {
         this.hadLoop = false;
 
         // Don't do anything if snake has hit the wall
-        if(!inBounds(this.headX, this.headY)) {
+        if(!inBounds(this.head.x, this.head.y)) {
             return;
         }
 
         // Find out which segment we've bitten, if any
-        var biteIndex = this.tailIndexAt(this.headX, this.headY);
+        var biteIndex = this.tailIndexAt(this.head.x, this.head.y);
         if(biteIndex == this.FREE) {
             return;
         }
@@ -421,17 +439,14 @@ var grid = {
                 // Get gameplay data for this cell
                 var isAlive = life.cellAt(x, y);
                 var wasAlive = life.oldCellAt(x, y);
-                var snakeKind = snake.segmentKindAt(x, y);
+                var snakeIndex = snake.indexAt(x, y);
 
                 // Visualize the cell depending on its gameplay state
                 var sprite = this.sprites[x * SIZE_Y + y];
 
                 // The snake
-                if(snakeKind == snake.HEAD) {
-                    this.showFrame(sprite, this.HTAIL_FRAME);
-                }
-                else if(snakeKind == snake.TAIL) {
-                    this.showFrame(sprite, this.HTAIL_FRAME);
+                if(snakeIndex != snake.FREE) {
+                    this.showSnakeSegment(sprite, snakeIndex);
                 }
                 // Annihilated surrounded cells, if any
                 else if(snake.hadLoop && snake.loopClassAt(x, y) != snake.OUTSIDE) {
@@ -463,6 +478,48 @@ var grid = {
                 }
             }
         }
+    },
+
+    showSnakeSegment: function(sprite, index) {
+        var cur = snake.posByIndex(index);
+        var nextDir, prevDir;
+
+        // Determine direction from this cell to the previous one,
+        // where "previous" means "neighbor closer to the head".
+        if(index == 0) {
+            prevDir = null;
+        } else {
+            var prev = snake.posByIndex(index - 1);
+            prevDir = directions.get(cur.x, cur.y, prev.x, prev.y);
+        }
+
+        // Determine direction from next cell to this one
+        if(index == snake.length() - 1) {
+            nextDir = null;
+        } else {
+            var next = snake.posByIndex(index + 1);
+            nextDir = directions.get(next.x, next.y, cur.x, cur.y);
+        }
+
+        // Choose which image to display
+        var frame;
+        if(prevDir === null) {
+            frame = (nextDir === null) ? this.HTAIL_FRAME : // One-point snake
+                (this.HEAD_FRAMES + nextDir); // Head sprite oriented accordingly
+        } else {
+            if(nextDir === null) {
+                frame = this.TAIL_FRAMES;
+            } else {
+                var angle = (prevDir - nextDir + 4) % 4;
+                frame = (angle == 1) ? this.CORNER_RIGHT_FRAMES:
+                    (angle == 3) ? this.CORNER_LEFT_FRAMES: this.MIDDLE_FRAMES;
+            }
+
+            frame += prevDir;
+        }
+
+        // Set the sprite to the chosen image
+        this.showFrame(sprite, frame);
     },
 
     showFrame: function(sprite, frame) {
@@ -713,7 +770,7 @@ var gameState = {
         snake.tick(inputQueue.maybePop());
 
         // Snake grows when it eats the cherry
-        if(cherry.exists && cherry.x == snake.headX && cherry.y == snake.headY) {
+        if(cherry.exists && cherry.x == snake.head.x && cherry.y == snake.head.y) {
             cherry.exists = false;
             snake.desiredLength++;
         }
@@ -741,8 +798,8 @@ var gameState = {
         currentTick++;
 
         // Restart everything when we die
-        if(!inBounds(snake.headX, snake.headY) ||
-                life.cellAt(snake.headX, snake.headY))
+        if(!inBounds(snake.head.x, snake.head.y) ||
+                life.cellAt(snake.head.x, snake.head.y))
         {
             this.initGameState();
         }
@@ -753,7 +810,7 @@ var gameState = {
         cherry.x = game.rnd.between(0, SIZE_X - 1);
         cherry.y = game.rnd.between(0, SIZE_Y - 1);
         cherry.exists = !life.cellAt(cherry.x, cherry.y) &&
-            (snake.segmentKindAt(cherry.x, cherry.y) == snake.FREE);
+            (snake.indexAt(cherry.x, cherry.y) == snake.FREE);
     }
 
 }
