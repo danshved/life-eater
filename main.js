@@ -415,9 +415,9 @@ var grid = {
             for(var y = 0; y < SIZE_Y; y++) {
                 var sprite = grp.create(FIELD_X + CELL_SIZE * x, FIELD_Y + CELL_SIZE * y,
                         'cell');
-                sprite.animations.add('die', [0, 1, 2, 3], 3 * 1000.0 / TICK_DELAY, false);
-                sprite.animations.add('appear', [3, 2, 1, 0], 3 * 1000.0 / TICK_DELAY, false);
-                sprite.animations.add('annihilate', [4, 5, 6, 7], 4 * 1000.0 / TICK_DELAY, false);
+                sprite.animations.add('die', [0, 1, 2, 3], 9, false);
+                sprite.animations.add('appear', [3, 2, 1, 0], 9, false);
+                sprite.animations.add('annihilate', [4, 5, 6, 7], 12, false);
                 sprite.visible = false;
                 this.sprites.push(sprite);
             }
