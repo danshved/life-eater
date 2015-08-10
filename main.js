@@ -880,3 +880,5 @@ game.state.start('boot');
 // TODO: maybe make Life 2 times slower? Otherwise a cell blinking with period 2
 // will be either lethal or not depending on whether it was born in an odd/even tick,
 // because it always takes an even number of ticks for the snake to make a loop.
+
+// TODO: don't use the default font
