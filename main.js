@@ -82,13 +82,13 @@ var life = {
 
         // Apply the rules of Life
         // Omit cells near the border: this 1-unit thin rectangle is Life-free.
-        for(var x = 1; x < SIZE_X - 1; x++) {
-            for(var y = 1; y < SIZE_Y - 1; y++) {
+        for(var x = 0; x < SIZE_X; x++) {
+            for(var y = 0; y < SIZE_Y; y++) {
                 // Count the neighbors
                 var cnt = 0;
                 for(var dx = -1; dx <= 1; dx++) {
                     for(var dy = -1; dy <= 1; dy ++) {
-                        if(this.oldCellAt(x + dx, y + dy))
+                        if(inBounds(x + dx, y + dy) && this.oldCellAt(x + dx, y + dy))
                         {
                             cnt++;
                         }
@@ -671,8 +671,8 @@ var colony = {
         this.assignPattern(pattern, matrix);
 
         // Choose the spawn position on the field
-        this.x = game.rnd.between(1, SIZE_X - 1 - this.sizeX);
-        this.y = game.rnd.between(1, SIZE_Y - 1 - this.sizeY);
+        this.x = game.rnd.between(0, SIZE_X - this.sizeX);
+        this.y = game.rnd.between(0, SIZE_Y - this.sizeY);
     },
 
     // Set the pattern that the colony will use
