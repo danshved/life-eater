@@ -832,7 +832,7 @@ var gameState = {
 
                     // Get points for all the life strictly inside the loop
                     if(situation == snake.INSIDE && life.cellAt(x, y)) {
-                        score++;
+                        score += snake.desiredLength;
                     }
 
                     // Destroy life inside and on the loop
