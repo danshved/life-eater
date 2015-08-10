@@ -403,8 +403,10 @@ var grid = {
     CORNER_LEFT_FRAMES: 28,
     CORNER_RIGHT_FRAMES: 32,
 
-    // How many times a colony preview blinks before the colony appears
-    COLONY_BLINKS: 3,
+    // How a colony preview blinks before the colony appears
+    COLONY_BLINKS: 3,  // Number of blinks
+    BLINK_PERIOD: 4,   // Blinking period, in ticks
+    BLINK_DURATION: 2, // How many ticks per period the future colony is shown
 
     // One sprite for each grid cell
     sprites: [],
@@ -431,9 +433,13 @@ var grid = {
     tick: function() {
         // Decide if we should be previewing the ``colony'', and if so,
         // whether it's an "on" or "off" blink phase.
-        var colonyTicks = colony.spawnTick - currentTick;
-        var colonyVisible = (colonyTicks > 0) && (colonyTicks <= 2 * this.COLONY_BLINKS) &&
-            !!(colonyTicks % 2);
+        var colonyVisible = false;
+        var colonyBegin = colony.spawnTick - this.BLINK_PERIOD * this.COLONY_BLINKS + 1;
+
+        if(currentTick >= colonyBegin && currentTick < colony.spawnTick) {
+            var periodTick = (currentTick - colonyBegin) % this.BLINK_PERIOD;
+            colonyVisible = (periodTick < this.BLINK_DURATION);
+        }
 
         // Show an appropriate frame for each cell, start animations where
         // necessary.
@@ -710,7 +716,7 @@ var colony = {
     }
 };
 
-// Text objects storing the current score etc.
+// Information above the game field: the current score etc.
 var hud = {
     // Y coordinate of the text (vertical anchor is text center)
     Y: 17,
