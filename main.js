@@ -713,10 +713,16 @@ var colony = {
 // Text objects storing the current score etc.
 var hud = {
     // Y coordinate of the text (vertical anchor is text center)
-    Y: 16,
+    Y: 17,
 
     // Gap between pictograms and neighboring text
     X_GAP: 3,
+
+    // Font to use for all HUD text
+    style: {
+        font: 'bold 24px Arial',
+        fill: 'white',
+    },
 
     scoreText: null,
     lengthText: null,
@@ -725,21 +731,13 @@ var hud = {
     // Called once when entering the 'game' state
     create: function() {
         // Snake length display
-        this.lengthText = game.add.text(42 + this.X_GAP, this.Y, '0');
+        this.lengthText = game.add.text(42 + this.X_GAP, this.Y, '0', this.style);
         this.lengthText.anchor.set(0.0, 0.5);
         this.lengthText.text = snake.START_LENGTH;
-        this.setCommonParams(this.lengthText);
 
         // Score display
-        this.scoreText = game.add.text(game.width - 42 - this.X_GAP, this.Y, '0');
+        this.scoreText = game.add.text(game.width - 42 - this.X_GAP, this.Y, '0', this.style);
         this.scoreText.anchor.set(1.0, 0.5);
-        this.setCommonParams(this.scoreText);
-    },
-
-    // Initialization done for every text object
-    setCommonParams: function(obj) {
-        // obj.fill = '#ff5500';    // color of the cherry
-        obj.fill = 'white';
     },
 
     tick: function() {
