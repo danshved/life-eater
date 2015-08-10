@@ -126,6 +126,9 @@ var snake = {
     // Minimal allowed length of the snake
     MIN_LENGTH: 3,
 
+    // Maximal allowed length
+    MAX_LENGTH: SIZE_X * SIZE_Y,
+
     // Length of the snake (desired) when the game starts. The nake will be
     // born with length 1 and immediately start growing until the length
     // reaches this value.
@@ -844,7 +847,7 @@ var gameState = {
         }
 
         // Respawn the cherry if it was eaten/destroyed
-        if(!cherry.exists) {
+        if(!cherry.exists && snake.desiredLength < snake.MAX_LENGTH) {
             this.maybeSpawnCherry();
         }
 
