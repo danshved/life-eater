@@ -388,6 +388,15 @@ var snake = {
 
 }.initialize(); // var snake = {...}
 
+// The difficulty curve manager
+var difficulty = {
+    // How many levels there are
+    LEVEL_COUNT: 8,
+
+    // Level that's active at the moment
+    level: 2
+};
+
 
 // The SIZE_X * SIZE_Y grid of sprites to display the game field.
 // This includes the Life cells and the snake's tail.
@@ -722,7 +731,7 @@ var colony = {
 // Information above the game field: the current score etc.
 var hud = {
     // Y coordinate of the text (vertical anchor is text center)
-    Y: 17,
+    TEXT_Y: 17,
 
     // Gap between pictograms and neighboring text
     X_GAP: 3,
@@ -733,25 +742,33 @@ var hud = {
         fill: 'white',
     },
 
+    // Text objects
     scoreText: null,
     lengthText: null,
+    levelText: null,
 
     // Initialization
     // Called once when entering the 'game' state
     create: function() {
         // Snake length display
-        this.lengthText = game.add.text(42 + this.X_GAP, this.Y, '0', this.style);
+        this.lengthText = game.add.text(42 + this.X_GAP, this.TEXT_Y, '0', this.style);
         this.lengthText.anchor.set(0.0, 0.5);
         this.lengthText.text = snake.START_LENGTH;
 
         // Score display
-        this.scoreText = game.add.text(game.width - 42 - this.X_GAP, this.Y, '0', this.style);
+        this.scoreText = game.add.text(game.width - 42 - this.X_GAP, this.TEXT_Y, '0', this.style);
         this.scoreText.anchor.set(1.0, 0.5);
+
+        // Difficulty level; text
+        this.levelText = game.add.text(game.width / 2, this.TEXT_Y, 'Level 1', this.style);
+        this.levelText.anchor.set(0.5);
+
     },
 
     tick: function() {
         this.lengthText.text = snake.desiredLength;
         this.scoreText.text = score;
+        this.levelText.text = "Level " + (difficulty.level + 1);
     }
 };
 
@@ -849,6 +866,12 @@ var gameState = {
         // Respawn the cherry if it was eaten/destroyed
         if(!cherry.exists && snake.desiredLength < snake.MAX_LENGTH) {
             this.maybeSpawnCherry();
+        }
+
+        // Increase difficulty as the player progresses
+        difficulty.level = Math.floor(score / 100);
+        if(difficulty.level >= difficulty.LEVEL_COUNT) {
+            difficulty.level = difficulty.LEVEL_COUNT - 1;
         }
 
         // Show what happened on the game field
