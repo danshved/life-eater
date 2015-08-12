@@ -1,0 +1,4 @@
+- Make higher levels longer to achieve
+- Display a progress bar for the next levelup
+- Change snake speed according to level
+- Change spawn frequency according to level

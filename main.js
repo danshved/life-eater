@@ -391,11 +391,42 @@ var snake = {
 // The difficulty curve manager
 var difficulty = {
     // How many levels there are
-    LEVEL_COUNT: 8,
+    LEVEL_COUNT: 1000,
+
+    // Which score triggers each level
+    // i'th value is the score to pass from level i to i+1.
+    LEVELUPS: [],
 
     // Level that's active at the moment
-    level: 2
-};
+    level: 0,
+
+    // One-time initialization
+    initialize: function() {
+        this.LEVELUPS.length = this.LEVEL_COUNT - 1;
+        for(var i = 1; i < this.LEVEL_COUNT; i++) {
+            this.LEVELUPS[i - 1] = 1000 * i;
+        }
+
+        return this;
+    },
+
+    // Called each time a new game starts
+    create: function() {
+        this.level = 0;
+    },
+
+    tick: function() {
+        // Levelup if necessary
+        while(this.level < this.LEVELUPS.length &&
+            score >= this.LEVELUPS[this.level])
+        {
+            this.level++;
+
+            // TODO: remove this
+            console.log("Levelup", this.level, currentTick);
+        }
+    }
+}.initialize();
 
 
 // The SIZE_X * SIZE_Y grid of sprites to display the game field.
@@ -811,6 +842,8 @@ var gameState = {
         currentTick = 0;
         score = 0;
 
+        difficulty.create();
+
         life.create();
         colony.generate();
         colony.spawnTick = colony.FIRST_DELAY;
@@ -869,10 +902,7 @@ var gameState = {
         }
 
         // Increase difficulty as the player progresses
-        difficulty.level = Math.floor(score / 100);
-        if(difficulty.level >= difficulty.LEVEL_COUNT) {
-            difficulty.level = difficulty.LEVEL_COUNT - 1;
-        }
+        difficulty.tick();
 
         // Show what happened on the game field
         grid.tick();

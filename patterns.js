@@ -31,6 +31,10 @@ var patterns = [
         "..O",
         ".O."
     ]),
+
+];
+
+var patterns2 = [
     // R-pentomino, by zorg's request
     new LifePattern([
         ".OO",
