@@ -425,7 +425,19 @@ var difficulty = {
             // TODO: remove this
             console.log("Levelup", this.level, currentTick);
         }
-    }
+    },
+
+    // Find out which fraction of score the user has got to complete this level
+    levelProgress: function() {
+        // No progress can ever be made on the last level
+        if(this.level >= this.LEVELUPS.length) {
+            return 0;
+        }
+
+        var nextScore = this.LEVELUPS[this.level];
+        var prevScore = (this.level == 0) ? 0 : this.LEVELUPS[this.level - 1];
+        return (score - prevScore) / (nextScore - prevScore);
+    },
 }.initialize();
 
 
@@ -767,6 +779,12 @@ var hud = {
     // Gap between pictograms and neighboring text
     X_GAP: 3,
 
+    // Position of the level progress bar
+    BAR_X: 275,
+    BAR_Y: 11,
+    BAR_SIZE_X: 90,
+    BAR_SIZE_Y: 6,
+
     // Font to use for all HUD text
     style: {
         font: 'bold 24px Arial',
@@ -778,28 +796,43 @@ var hud = {
     lengthText: null,
     levelText: null,
 
+    // Graphics object for the level progress bar
+    bar: null,
+
     // Initialization
     // Called once when entering the 'game' state
     create: function() {
         // Snake length display
         this.lengthText = game.add.text(42 + this.X_GAP, this.TEXT_Y, '0', this.style);
         this.lengthText.anchor.set(0.0, 0.5);
-        this.lengthText.text = snake.START_LENGTH;
 
         // Score display
         this.scoreText = game.add.text(game.width - 42 - this.X_GAP, this.TEXT_Y, '0', this.style);
         this.scoreText.anchor.set(1.0, 0.5);
 
         // Difficulty level; text
-        this.levelText = game.add.text(game.width / 2, this.TEXT_Y, 'Level 1', this.style);
-        this.levelText.anchor.set(0.5);
+        this.levelText = game.add.text(this.BAR_X - 5 - this.X_GAP, this.TEXT_Y,
+            '0', this.style);
+        this.levelText.anchor.set(1.0, 0.5);
 
+        // Progress bar
+        this.bar = game.add.graphics(this.BAR_X, this.BAR_Y);
     },
 
     tick: function() {
+        // Update all text objects
         this.lengthText.text = snake.desiredLength;
         this.scoreText.text = score;
-        this.levelText.text = "Level " + (difficulty.level + 1);
+        this.levelText.text = "Lvl " + (difficulty.level + 1);
+
+        // Draw the progress bar. In fact, the progress bar is part of the background.
+        // We paint a black rectangle to hide a part of it.
+        var x = Math.floor(this.BAR_SIZE_X * difficulty.levelProgress());
+
+        this.bar.clear();
+        this.bar.beginFill(0x000000);
+        this.bar.drawRect(x, 0, this.BAR_SIZE_X - x, this.BAR_SIZE_Y);
+        this.bar.endFill();
     }
 };
 
@@ -819,18 +852,22 @@ var bootState = {
     }
 };
 
-var gameState = {
-    create: function() {
+var gameState = { create: function() {
         // Initialize state of the game
         this.initGameState();
 
         // Prepare to accept user input
         inputQueue.create();
 
-        // Create all the Phaser objects
+        // Show the bg image: grid around the game field and HUD icons
         game.add.sprite(0, 0, 'background');
+
+        // Create and show the empty field
         grid.create();
+
+        // Create the HUD elements and show initial values
         hud.create();
+        hud.tick();
 
         // Launch the main timer to measure ticks by which Life & Snake live.
         game.time.events.loop(TICK_DELAY, this.tick, this);
