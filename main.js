@@ -391,7 +391,7 @@ var snake = {
 // The difficulty curve manager
 var difficulty = {
     // How many levels there are
-    LEVEL_COUNT: 1000,
+    LEVEL_COUNT: 10,
 
     // Which score triggers each level
     // i'th value is the score to pass from level i to i+1.
@@ -404,7 +404,7 @@ var difficulty = {
     initialize: function() {
         this.LEVELUPS.length = this.LEVEL_COUNT - 1;
         for(var i = 1; i < this.LEVEL_COUNT; i++) {
-            this.LEVELUPS[i - 1] = 1000 * i;
+            this.LEVELUPS[i - 1] = 500 * i * (i + 1);
         }
 
         return this;
@@ -413,6 +413,7 @@ var difficulty = {
     // Called each time a new game starts
     create: function() {
         this.level = 0;
+        this.tick();
     },
 
     tick: function() {
@@ -421,10 +422,12 @@ var difficulty = {
             score >= this.LEVELUPS[this.level])
         {
             this.level++;
-
-            // TODO: remove this
-            console.log("Levelup", this.level, currentTick);
         }
+
+        // Adjust game parameters according to the current level
+        // Spawns per tick: 0.012 (delay 83) -> 0.08 (delay 13)
+        var spawnsPerTick = 0.012 + 0.068 * this.level / (this.LEVEL_COUNT - 1);
+        colony.spawnDelay = Math.round(1 / spawnsPerTick);
     },
 
     // Find out which fraction of score the user has got to complete this level
@@ -685,7 +688,7 @@ var colony = {
     FIRST_DELAY: 20,
 
     // How many ticks pass between colony spawns
-    SPAWN_DELAY: SIZE_X + SIZE_Y,
+    spawnDelay: 85,
 
     // When the colony will be spawned
     spawnTick: 0,
@@ -853,7 +856,7 @@ var bootState = {
 };
 
 var gameState = { create: function() {
-        // Initialize state of the game
+        // Initialize all gamestate variables (Life field, snake, score etc.)
         this.initGameState();
 
         // Prepare to accept user input
@@ -897,7 +900,7 @@ var gameState = { create: function() {
         if(currentTick >= colony.spawnTick) {
             life.add(colony.x, colony.y, colony);
             colony.generate();
-            colony.spawnTick = currentTick + colony.SPAWN_DELAY;
+            colony.spawnTick = currentTick + colony.spawnDelay;
         }
 
         // Destroy the cherry if life crept on it
