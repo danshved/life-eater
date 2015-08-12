@@ -814,7 +814,7 @@ var hud = {
         this.scoreText.anchor.set(1.0, 0.5);
 
         // Difficulty level; text
-        this.levelText = game.add.text(this.BAR_X - 5 - this.X_GAP, this.TEXT_Y,
+        this.levelText = game.add.text(this.BAR_X - 4 - this.X_GAP, this.TEXT_Y,
             '0', this.style);
         this.levelText.anchor.set(1.0, 0.5);
 
@@ -826,7 +826,7 @@ var hud = {
         // Update all text objects
         this.lengthText.text = snake.desiredLength;
         this.scoreText.text = score;
-        this.levelText.text = "Lvl " + (difficulty.level + 1);
+        this.levelText.text = (difficulty.level + 1);
 
         // Draw the progress bar. In fact, the progress bar is part of the background.
         // We paint a black rectangle to hide a part of it.
@@ -925,7 +925,10 @@ var gameState = { create: function() {
 
                     // Get points for all the life strictly inside the loop
                     if(situation == snake.INSIDE && life.cellAt(x, y)) {
-                        score += snake.desiredLength;
+                        // Score multiplier is the snake's length. We add 1 to
+                        // compensate for 1 unit of length that was lost when
+                        // the snake bit itself.
+                        score += snake.desiredLength + 1;
                     }
 
                     // Destroy life inside and on the loop
