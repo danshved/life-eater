@@ -805,6 +805,9 @@ var hud = {
     // Initialization
     // Called once when entering the 'game' state
     create: function() {
+        // HUD icons
+        game.add.sprite(0, 0, 'hud-bg');
+
         // Snake length display
         this.lengthText = game.add.text(42 + this.X_GAP, this.TEXT_Y, '0', this.style);
         this.lengthText.anchor.set(0.0, 0.5);
@@ -848,6 +851,7 @@ var bootState = {
     preload: function() {
         game.load.spritesheet('cell', 'assets/cells.png', 12, 12);
         game.load.image('background', 'assets/background.png');
+        game.load.image('hud-bg', 'assets/hud-bg.png');
     },
 
     create: function() {
