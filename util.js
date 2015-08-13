@@ -1,3 +1,20 @@
+// Constants to operate with the 4 directions
+var directions = {
+    RIGHT: 0,
+    DOWN: 1,
+    LEFT: 2,
+    UP: 3,
+
+    dx: [1, 0, -1, 0],
+    dy: [0, 1, 0, -1],
+
+    get: function(x1, y1, x2, y2) {
+        return (x2 == x1 + 1) ? this.RIGHT :
+            (x2 == x1 - 1) ? this.LEFT :
+            (y2 == y1 + 1) ? this.DOWN : this.UP;
+    }
+};
+
 // Operations with 2x2 matrices
 function Matrix2(m00, m01, m10, m11) {
     this.m00 = m00;
