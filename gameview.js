@@ -179,11 +179,11 @@ var hud = {
     TEXT_Y: 17,
 
     // Gap between pictograms and neighboring text
-    X_GAP: 3,
+    X_GAP: 5,
 
     // Position of the level progress bar
-    BAR_X: 275,
-    BAR_Y: 11,
+    BAR_X: 270,
+    BAR_Y: 6,
     BAR_SIZE_X: 90,
     BAR_SIZE_Y: 6,
 
@@ -209,22 +209,22 @@ var hud = {
         // HUD icons
         this.background = game.add.sprite(0, 0, 'hud-bg');
 
+        // Progress bar for the difficulty level
+        this.bar = game.add.sprite(this.BAR_X, this.BAR_Y, 'hud-bar');
+
         // Snake length display
-        this.lengthText = game.add.text(42 + this.X_GAP, this.TEXT_Y, '0', this.style);
+        this.lengthText = game.add.text(40 + this.X_GAP, this.TEXT_Y, '0', this.style);
         this.lengthText.anchor.set(0.0, 0.5);
 
         // Score display
-        this.scoreText = game.add.text(game.width - 42 - this.X_GAP, this.TEXT_Y,
+        this.scoreText = game.add.text(game.width - 40 - this.X_GAP, this.TEXT_Y,
             '0', this.style);
         this.scoreText.anchor.set(1.0, 0.5);
 
-        // Difficulty level; text
-        this.levelText = game.add.text(this.BAR_X - 4 - this.X_GAP, this.TEXT_Y,
+        // Difficulty level
+        this.levelText = game.add.text(this.BAR_X + 3 - this.X_GAP, this.TEXT_Y,
             '0', this.style);
         this.levelText.anchor.set(1.0, 0.5);
-
-        // Progress bar
-        this.bar = game.add.graphics(this.BAR_X, this.BAR_Y);
     },
 
     // Hide the HUD until the next tick()
@@ -241,14 +241,8 @@ var hud = {
         this.scoreText.text = score;
         this.levelText.text = (difficulty.level + 1);
 
-        // Draw the progress bar. In fact, the progress bar is part of the background.
-        // We paint a black rectangle to hide a part of it.
-        var x = Math.floor(this.BAR_SIZE_X * difficulty.levelProgress());
-
-        this.bar.clear();
-        this.bar.beginFill(0x000000);
-        this.bar.drawRect(x, 0, this.BAR_SIZE_X - x, this.BAR_SIZE_Y);
-        this.bar.endFill();
+        // Draw the progress bar. Simply show the appropriate line of the spritesheet
+        this.bar.frame = Math.floor(15.0 * difficulty.levelProgress());
     },
 
     // Hide or show the entire HUD
