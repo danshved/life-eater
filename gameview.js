@@ -50,6 +50,13 @@ var grid = {
         }
     },
 
+    // Hide all the sprites until the next tick()
+    hide: function() {
+        for(var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].visible = false;
+        }
+    },
+
     // Animate Life & snake: show what happened in their last tick()
     tick: function() {
         // Decide if we should be previewing the ``colony'', and if so,
@@ -194,17 +201,21 @@ var hud = {
     // Graphics object for the level progress bar
     bar: null,
 
+    // Bar background sprite, i.e. the "icons"
+    background: null,
+
     // One-time initialization
     create: function() {
         // HUD icons
-        game.add.sprite(0, 0, 'hud-bg');
+        this.background = game.add.sprite(0, 0, 'hud-bg');
 
         // Snake length display
         this.lengthText = game.add.text(42 + this.X_GAP, this.TEXT_Y, '0', this.style);
         this.lengthText.anchor.set(0.0, 0.5);
 
         // Score display
-        this.scoreText = game.add.text(game.width - 42 - this.X_GAP, this.TEXT_Y, '0', this.style);
+        this.scoreText = game.add.text(game.width - 42 - this.X_GAP, this.TEXT_Y,
+            '0', this.style);
         this.scoreText.anchor.set(1.0, 0.5);
 
         // Difficulty level; text
@@ -216,7 +227,15 @@ var hud = {
         this.bar = game.add.graphics(this.BAR_X, this.BAR_Y);
     },
 
+    // Hide the HUD until the next tick()
+    hide: function() {
+        this.setVisible(false);
+    },
+
     tick: function() {
+        // Show everything if it was hidden
+        this.setVisible(true);
+
         // Update all text objects
         this.lengthText.text = snake.desiredLength;
         this.scoreText.text = score;
@@ -230,7 +249,17 @@ var hud = {
         this.bar.beginFill(0x000000);
         this.bar.drawRect(x, 0, this.BAR_SIZE_X - x, this.BAR_SIZE_Y);
         this.bar.endFill();
+    },
+
+    // Hide or show the entire HUD
+    setVisible: function(value) {
+        this.background.visible = value;
+        this.lengthText.visible = value;
+        this.scoreText.visible = value;
+        this.levelText.visible = value;
+        this.bar.visible = value;
     }
+
 };
 
 // TODO: don't use the default font

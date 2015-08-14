@@ -558,4 +558,4 @@ var gameLogic = {
             (snake.indexAt(cherry.x, cherry.y) == snake.FREE);
     }
 
-} // var gameLogic = {...}
+}; // var gameLogic = {...}

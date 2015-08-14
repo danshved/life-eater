@@ -17,7 +17,7 @@ var inputQueue = {
         return this;
     },
 
-    // Called once when entering the 'game' state
+    // Called each time the user starts a new game
     create: function() {
         // Empty the buffer
         this.queueIn = 0;
@@ -69,5 +69,4 @@ var inputQueue = {
     }
 
 }.initialize();
-
 
