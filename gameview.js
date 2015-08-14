@@ -1,8 +1,8 @@
 // Classes that display the ongoing game
 
 // Top-left corner of the game field
-var FIELD_X = 14;
-var FIELD_Y = 36;
+var FIELD_X = 12;
+var FIELD_Y = 34;
 
 // Size of a cell on the game field (cells are squares)
 var CELL_SIZE = 12;

@@ -1,6 +1,6 @@
 var bootState = {
     preload: function() {
-        game.load.spritesheet('cell', 'assets/cells.png', 12, 12);
+        game.load.spritesheet('cell', 'assets/cells.png', 16, 16);
         game.load.image('background', 'assets/background.png');
         game.load.image('hud-bg', 'assets/hud-bg.png');
         game.load.image('gameover-icons', 'assets/gameover-icons.png');
