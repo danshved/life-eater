@@ -32,7 +32,7 @@ var grid = {
     // One sprite for each grid cell
     sprites: [],
 
-    // Initialization. Called once when 'game' state is entered.
+    // One-time initialization.
     create: function() {
         var grp = game.add.spriteBatch();
         this.sprites = [];
@@ -194,8 +194,7 @@ var hud = {
     // Graphics object for the level progress bar
     bar: null,
 
-    // Initialization
-    // Called once when entering the 'game' state
+    // One-time initialization
     create: function() {
         // HUD icons
         game.add.sprite(0, 0, 'hud-bg');

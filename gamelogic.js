@@ -44,7 +44,7 @@ var life = {
     },
 
     // Called each time the user starts a new game
-    create: function() {
+    reset: function() {
         // Clear the field
         for(var i = 0; i < SIZE_X * SIZE_Y; i++) {
             this.cells[i] = false;
@@ -207,8 +207,8 @@ var snake = {
     // reaches this value.
     START_LENGTH: 15,
 
-    // Classification of field cells w.r.t. the snake
-    FREE: -1, // "Snake isn't over this cell"
+    // Special value saying that the snake doesn't occupy the given cell
+    FREE: -1,
 
     // Classification of field cells w.r.t. the surrounding made by the snake
     INSIDE: -2,
@@ -254,14 +254,11 @@ var snake = {
     },
 
     // Initialize the snake. Called every time the user starts a new game.
-    create: function() {
+    reset: function() {
         // Place ourselves on the center of the field, looking up
         this.head.x = Math.round(SIZE_X / 2);
         this.head.y = Math.round(SIZE_Y / 2),
         this.headDir = directions.UP,
-
-        // Start growing
-        this.desiredLength = this.START_LENGTH;
 
         // Clear the circular buffer representing our tail
         this.tailIn = 0;
@@ -272,14 +269,16 @@ var snake = {
             this.tailIndices[i] = this.FREE;
         }
 
+        // Start growing
+        this.desiredLength = this.START_LENGTH;
+
         // Reset other misc. data
         this.hadLoop = false;
     },
 
     // Returns the snake's length, head included
     length: function() {
-        return (this.tailIn - this.tailOut + this.tail.length)
-            % this.tail.length + 1;
+        return (this.tailIn - this.tailOut + this.tail.length) % this.tail.length + 1;
     },
 
     // Return the (x, y) coordinates of a cell with given index,
@@ -476,14 +475,14 @@ var gameLogic = {
         score = 0;
 
         // Empty the Life
-        life.create();
+        life.reset();
 
         // Plan the first colony drop
         colony.generate();
         colony.spawnTick = colony.FIRST_DELAY;
 
         // Put the snake in start position
-        snake.create();
+        snake.reset();
 
         // Pick a random place for the cherry
         this.maybeSpawnCherry();
@@ -550,8 +549,8 @@ var gameLogic = {
             || life.cellAt(snake.head.x, snake.head.y);
     },
 
-    // Try to spawn the cherry. Cherry can be not spawned when
-    // the field is crowded by life/snake.
+    // Try to spawn the cherry. Cherry may not be spawned when
+    // the field is too crowded.
     maybeSpawnCherry: function() {
         cherry.x = game.rnd.between(0, SIZE_X - 1);
         cherry.y = game.rnd.between(0, SIZE_Y - 1);
@@ -559,4 +558,4 @@ var gameLogic = {
             (snake.indexAt(cherry.x, cherry.y) == snake.FREE);
     }
 
-}
+} // var gameLogic = {...}

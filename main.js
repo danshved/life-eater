@@ -6,7 +6,16 @@ var bootState = {
     },
 
     create: function() {
-        game.state.start('game');
+        // Show the bg image: grid around the game field
+        game.add.sprite(0, 0, 'background');
+
+        // Create and show the empty field
+        grid.create();
+
+        // Create the HUD elements and show initial values
+        hud.create();
+
+        game.state.start('game', false);
     }
 };
 
@@ -16,30 +25,18 @@ var gameState = {
 
     create: function() {
         // Initialize all gamestate variables (Life field, snake, score etc.)
-        this.reset();
+        difficulty.reset();
+        gameLogic.reset();
 
         // Prepare to accept user input
         inputQueue.create();
 
-        // Show the bg image: grid around the game field and HUD icons
-        game.add.sprite(0, 0, 'background');
-
-        // Create and show the empty field
-        grid.create();
-
-        // Create the HUD elements and show initial values
-        hud.create();
-        hud.tick();
-
         // Launch the main timer to measure ticks by which Life & the snake live.
         game.time.events.loop(this.TICK_DELAY, this.tick, this);
-    },
 
-    // Initializes game state. If a game is already in progress, this will
-    // have the effect of aborting it and starting a fresh one.
-    reset: function() {
-        difficulty.create();
-        gameLogic.reset();
+        // Show initial state of the game on the screen
+        grid.tick();
+        hud.tick();
     },
 
     tick: function() {
@@ -57,10 +54,9 @@ var gameState = {
         currentTick++;
 
         // Restart everything when we die
-        if(!inBounds(snake.head.x, snake.head.y) ||
-            life.cellAt(snake.head.x, snake.head.y))
+        if(gameLogic.gameOver())
         {
-            this.reset();
+            game.state.start('game', false);
         }
     }
 }

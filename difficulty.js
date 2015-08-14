@@ -21,7 +21,7 @@ var difficulty = {
     },
 
     // Called each time a new game starts
-    create: function() {
+    reset: function() {
         this.level = 0;
         this.apply();
     },
