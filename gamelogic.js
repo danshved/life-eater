@@ -562,3 +562,5 @@ var gameLogic = {
     }
 
 }; // var gameLogic = {...}
+
+// TODO: try awarding length for cherries in an arithmetic progression (until the next self-bite)

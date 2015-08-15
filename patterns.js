@@ -24,6 +24,841 @@ var patterns = [
         "OO",
         "OO"
     ]),
+    // Beehive at beehive (still)
+    new LifePattern([
+        "....O.",
+        "...O.O",
+        "...O.O",
+        ".OO.O.",
+        "O..O..",
+        ".OO..."
+    ]),
+    // Ship on long boat (still)
+    new LifePattern([
+        "OO.....",
+        "O.O....",
+        ".OO....",
+        "...OO..",
+        "...O.O.",
+        "....O.O",
+        ".....O."
+    ]),
+    // Cis-R-bee and R-loaf (still)
+    new LifePattern([
+        ".OO.",
+        "O..O",
+        ".OOO",
+        "....",
+        ".OOO",
+        "O..O",
+        "O.O.",
+        ".O.."
+    ]),
+    // Beehive with nine (still)
+    new LifePattern([
+        ".OO....",
+        "O..O...",
+        ".OO.O..",
+        "....O..",
+        "....O.O",
+        ".....OO"
+    ]),
+    // Beehive bend tail (still)
+    new LifePattern([
+        ".OO..",
+        "O..O.",
+        ".OO.O",
+        "....O",
+        ".OOO.",
+        ".O..."
+    ]),
+    // Ortho-loaf and table (still)
+    new LifePattern([
+        "..O..",
+        ".O.O.",
+        ".O..O",
+        "..OO.",
+        ".....",
+        "OOOO.",
+        "O..O."
+    ]),
+    // Trans-boat with nine (still)
+    new LifePattern([
+        "OO....",
+        "O.O...",
+        ".O....",
+        "..OOO.",
+        ".....O",
+        "....OO"
+    ]),
+    // Beehive and cap (still)
+    new LifePattern([
+        ".OO..",
+        "O..O.",
+        "OOOO.",
+        ".....",
+        "..OO.",
+        ".O..O",
+        "..OO."
+    ]),
+    // Long long barge (still)
+    new LifePattern([
+        ".O....",
+        "O.O...",
+        ".O.O..",
+        "..O.O.",
+        "...O.O",
+        "....O."
+    ]),
+    // Trans-barge with tail (still)
+    new LifePattern([
+        "OO....",
+        ".O....",
+        ".O.O..",
+        "..O.O.",
+        "...O.O",
+        "....O."
+    ]),
+    // Snorkel loop (stil)
+    new LifePattern([
+        "..OO..",
+        ".O..O.",
+        "..O.O.",
+        "O.O.OO",
+        "OO...."
+    ]),
+    // Beehive and table (still)
+    new LifePattern([
+        "..OO.",
+        ".O..O",
+        "..OO.",
+        ".....",
+        "OOOO.",
+        "O..O."
+    ]),
+    // Cis-boat and table (still)
+    new LifePattern([
+        ".O..",
+        "O.O.",
+        "OO..",
+        "....",
+        "OOOO",
+        "O..O"
+    ]),
+    // R-bee and snake (still)
+    new LifePattern([
+        "OO.O.",
+        "O.OO.",
+        ".....",
+        ".OOO.",
+        ".O..O",
+        "..OO."
+    ]),
+    // Eater on boat (still)
+    new LifePattern([
+        ".OO..",
+        ".O.O.",
+        "...O.",
+        "...OO",
+        ".OO..",
+        "O.O..",
+        ".O..."
+    ]),
+    // Trans-boat and dock (still)
+    new LifePattern([
+        ".O....",
+        "O.O...",
+        ".OO...",
+        "......",
+        ".OOOO.",
+        "O....O",
+        "OO..OO"
+    ]),
+    // Long long canoe (still)
+    new LifePattern([
+        ".....OO",
+        "......O",
+        ".....O.",
+        "....O..",
+        "...O...",
+        "O.O....",
+        "OO....."
+    ]),
+    // Long canoe (still)
+    new LifePattern([
+        "....OO",
+        ".....O",
+        "....O.",
+        "...O..",
+        "O.O...",
+        "OO...."
+    ]),
+    // Trans-rotated R-bee (still)
+    new LifePattern([
+        ".O.....",
+        "O.O....",
+        "O.O....",
+        ".OO.OO.",
+        "....O.O",
+        "....O.O",
+        ".....O."
+    ]),
+    // Bee hat (still)
+    new LifePattern([
+        ".OO...",
+        "O..O..",
+        ".OO.O.",
+        "..O.O.",
+        "O.O.OO",
+        "OO...."
+    ]),
+    // Cis-loaf with tail (still)
+    new LifePattern([
+        "...OO.",
+        "..O..O",
+        ".O.O.O",
+        ".O..O.",
+        "OO...."
+    ]),
+    // Symmetric scorpion (still)
+    new LifePattern([
+        "...O...",
+        ".OOOOO.",
+        "O.....O",
+        "O.O.O.O",
+        ".OO.OO."
+    ]),
+    // Claw with tail (still)
+    new LifePattern([
+        "OO....",
+        ".O....",
+        ".O.OO.",
+        "..O..O",
+        "....OO"
+    ]),
+    // Eleven loop (still)
+    new LifePattern([
+        ".O...",
+        "O.O..",
+        "O..O.",
+        ".O.O.",
+        "OO.OO"
+    ]),
+    // Long integral (still)
+    new LifePattern([
+        "..OO",
+        ".O.O",
+        ".O..",
+        "..O.",
+        "O.O.",
+        "OO.."
+    ]),
+    // Hook with tail (still)
+    new LifePattern([
+        "OO...",
+        ".O...",
+        ".O.OO",
+        "..O.O"
+    ]),
+    // Load siamese loaf (still)
+    new LifePattern([
+        "..OO.",
+        ".O..O",
+        "O.O.O",
+        "O..O.",
+        ".OO.."
+    ]),
+    // Tub with long tail (still)
+    new LifePattern([
+        ".O..",
+        "O.O.",
+        ".O.O",
+        "...O",
+        "..O.",
+        "..OO"
+    ]),
+    // Beehive at loaf (still)
+    new LifePattern([
+        "....O.",
+        "...O.O",
+        "...O.O",
+        ".OO.O.",
+        "O..O..",
+        "O.O...",
+        ".O...."
+    ]),
+    // Cis-hook and R-bee (still)
+    new LifePattern([
+        "..OO",
+        "O..O",
+        "OOO.",
+        "....",
+        "OOO.",
+        "O..O",
+        ".OO."
+    ]),
+    // Boat with long tail (still)
+    new LifePattern([
+        "OO....",
+        "O.O...",
+        ".O..OO",
+        "..OO.O"
+    ]),
+    // Trans-R-bee and R-loaf (still)
+    new LifePattern([
+        "..OO.",
+        ".O..O",
+        ".OOO.",
+        ".....",
+        ".OOO.",
+        "O..O.",
+        "O.O..",
+        ".O..."
+    ]),
+    // Long long shillelagh (still)
+    new LifePattern([
+        ".....OO",
+        "OO..O.O",
+        "O..O...",
+        ".OO...."
+    ]),
+    // Long shillelagh (still)
+    new LifePattern([
+        "OO..OO",
+        "O..O.O",
+        ".OO..."
+    ]),
+    // Integral with tub (still)
+    new LifePattern([
+        "OO....",
+        "O.O...",
+        "..O...",
+        "..O.O.",
+        "...O.O",
+        "....O."
+    ]),
+    // Cis-block and long hook (still)
+    new LifePattern([
+        "...OO",
+        "O...O",
+        "OOOO.",
+        ".....",
+        "..OO.",
+        "..OO."
+    ]),
+    // Eater siamese eater (still)
+    new LifePattern([
+        "OO..",
+        "O.O.",
+        "..O.",
+        "..OO",
+        "...O",
+        "OOO.",
+        "O..."
+    ]),
+    // Cis-boat and dock (still)
+    new LifePattern([
+        "..O...",
+        ".O.O..",
+        ".OO...",
+        "......",
+        ".OOOO.",
+        "O....O",
+        "OO..OO"
+    ]),
+    // Block and two walls (still)
+    new LifePattern([
+        "OO.OO",
+        "OO.O.",
+        "...O.",
+        "OOO..",
+        "O...."
+    ]),
+    // Trans-hook and R-bee (still)
+    new LifePattern([
+        "...OO",
+        ".O..O",
+        ".OOO.",
+        ".....",
+        ".OOO.",
+        "O..O.",
+        ".OO.."
+    ]),
+    // Mirrored dock (still)
+    new LifePattern([
+        "OO..OO",
+        "O....O",
+        ".OOOO.",
+        "......",
+        ".OOOO.",
+        "O....O",
+        "OO..OO"
+    ]),
+    // Cis-shillelagh (still)
+    new LifePattern([
+        "....OO",
+        ".....O",
+        "OO..O.",
+        "O..O..",
+        ".OO..."
+    ]),
+    // Trans-block and long hook (still)
+    new LifePattern([
+        "...OO",
+        "O...O",
+        "OOOO.",
+        ".....",
+        "OO...",
+        "OO..."
+    ]),
+    // Cis-rotated hook (still)
+    new LifePattern([
+        ".OO....",
+        "..O..OO",
+        "O.O.O.O",
+        "Oo..O..",
+        "....OO."
+    ]),
+    // Trans-loaf with tail (still)
+    new LifePattern([
+        "OO....",
+        ".O....",
+        ".O.OO.",
+        "..O..O",
+        "...O.O",
+        "....O."
+    ]),
+    // Block and cap (still)
+    new LifePattern([
+        ".OO.",
+        "O..O",
+        "OOOO",
+        "....",
+        "OO..",
+        "OO.."
+    ]),
+    // Elevener (still)
+    new LifePattern([
+        "....OO",
+        "...O.O",
+        "...O..",
+        ".OOO..",
+        "O.....",
+        "OO...."
+    ]),
+    // Bookends (still)
+    new LifePattern([
+        "OO...OO",
+        "O.O.O.O",
+        "..O.O..",
+        ".OO.OO."
+    ]),
+    // Dead spark coil (still)
+    new LifePattern([
+        "OO...OO",
+        "O.O.O.O",
+        "..O.O..",
+        "O.O.O.O",
+        "OO...OO"
+    ]),
+    // Trans-mirrored R-bee (still)
+    new LifePattern([
+        ".....O.",
+        ".OO.O.O",
+        "O.O.O.O",
+        "O.O.OO.",
+        ".O....."
+    ]),
+    // Cis-boat with tail (still)
+    new LifePattern([
+        "...OO",
+        "...O.",
+        "OO.O.",
+        "O.O..",
+        ".O..."
+    ]),
+    // Fourteener (still)
+    new LifePattern([
+        "....OO.",
+        "OO..O.O",
+        "O.....O",
+        ".OOOOO.",
+        "...O..."
+    ]),
+    // Loop (still)
+    new LifePattern([
+        ".OO..",
+        "O..O.",
+        ".O.O.",
+        "OO.OO"
+    ]),
+    // Scorpion (still)
+    new LifePattern([
+        "...O...",
+        ".OOO...",
+        "O...OO.",
+        "O.O.O.O",
+        ".OO.O.O",
+        ".....O."
+    ]),
+    // Beehive with tail (still)
+    new LifePattern([
+        ".OO...",
+        "O..O..",
+        ".OO.O.",
+        "....O.",
+        "....OO"
+    ]),
+    // Beehive and dock (still)
+    new LifePattern([
+        "...OO.",
+        "..O..O",
+        "...OO.",
+        "......",
+        ".OOOO.",
+        "O....O",
+        "OO..OO"
+    ]),
+    // Twin hat (still)
+    new LifePattern([
+        "..O...O..",
+        ".O.O.O.O.",
+        ".O.O.O.O.",
+        "OO.O.O.OO",
+        "....O...."
+    ]),
+    // Block and dock (still)
+    new LifePattern([
+        "...OO.",
+        "...OO.",
+        "......",
+        ".OOOO.",
+        "O....O",
+        "OO..OO"
+    ]),
+    // Block on table (still)
+    new LifePattern([
+        "..OO",
+        "..OO",
+        "....",
+        "OOOO",
+        "O..O"
+    ]),
+    // Moose antlers (still)
+    new LifePattern([
+        "OO.....OO",
+        "O.......O",
+        ".OOO.OOO.",
+        "...O.O...",
+        "....O...."
+    ]),
+    // Cis-mirrored R-bee (still)
+    new LifePattern([
+        ".OO.OO.",
+        "O.O.O.O",
+        "O.O.O.O",
+        ".O...O."
+    ]),
+    // Alternate table on table (still)
+    new LifePattern([
+        "O..O..",
+        "OOOO..",
+        "......",
+        "..OOOO",
+        "..O..O"
+    ]),
+    // Table on table (still)
+    new LifePattern([
+        "O..O",
+        "OOOO",
+        "....",
+        "OOOO",
+        "O..O"
+    ]),
+    // Long long ship (still)
+    new LifePattern([
+        "OO...",
+        "O.O..",
+        ".O.O.",
+        "..O.O",
+        "...OO"
+    ]),
+    // Tub with tail (still)
+    new LifePattern([
+        ".O...",
+        "O.O..",
+        ".O.O.",
+        "...O.",
+        "...OO"
+    ]),
+    // Long long boat (still)
+    new LifePattern([
+        ".O...",
+        "O.O..",
+        ".O.O.",
+        "..O.O",
+        "...OO"
+    ]),
+    // Boat-ship-tie (still)
+    new LifePattern([
+        "OO....",
+        "O.O...",
+        ".OO...",
+        "...OO.",
+        "...O.O",
+        "....O.",
+    ]),
+    // Hat (still)
+    new LifePattern([
+        "..O..",
+        ".O.O.",
+        ".O.O.",
+        "OO.OO"
+    ]),
+    // Trans-boat with tail (still)
+    new LifePattern([
+        "OO...",
+        "O.O..",
+        ".O.O.",
+        "...O.",
+        "...OO"
+    ]),
+    // Bi-pond (still)
+    new LifePattern([
+        ".OO....",
+        "O..O...",
+        "O..O...",
+        ".OO.OO.",
+        "...O..O",
+        "...O..O",
+        "....OO."
+    ]),
+    // Big S (still)
+    new LifePattern([
+        "....OO.",
+        "...O..O",
+        "...O.OO",
+        "OO.O...",
+        "O..O...",
+        ".OO...."
+    ]),
+    // Snake bridge snake (still)
+    new LifePattern([
+        "....OO",
+        "....O.",
+        ".....O",
+        "....OO",
+        "OO.O..",
+        "O.OO.."
+    ]),
+    // Carrier siamese snake (still)
+    new LifePattern([
+        "OO.OO..",
+        "O.OO..O",
+        ".....OO"
+    ]),
+    // Snake siamese snake (still)
+    new LifePattern([
+        "OO.OO.O",
+        "O.OO.OO"
+    ]),
+    // Canoe (still)
+    new LifePattern([
+        "...OO",
+        "....O",
+        "...O.",
+        "O.O..",
+        "OO..."
+    ]),
+    // Extra extra long snake (still)
+    new LifePattern([
+        "OO......",
+        "O.O.....",
+        "...O....",
+        "....O...",
+        ".....O.O",
+        "......OO"
+    ]),
+    // Extra long snake (still)
+    new LifePattern([
+        "OO.....",
+        "O.O....",
+        "...O...",
+        "....O.O",
+        ".....OO"
+    ]),
+    // Long long snake (still)
+    new LifePattern([
+        "OO....",
+        "O.O...",
+        "...O.O",
+        "....OO"
+    ]),
+    // Long snake (still)
+    new LifePattern([
+        "OO...",
+        "O.O.O",
+        "...OO"
+    ]),
+    // Snake (still)
+    new LifePattern([
+        "OO.O",
+        "O.OO"
+    ]),
+    // Boat-tie (still)
+    new LifePattern([
+        ".O....",
+        "O.O...",
+        ".OO...",
+        "...OO.",
+        "...O.O",
+        "....O.",
+    ]),
+    // Integral sign (still)
+    new LifePattern([
+        "...OO",
+        "..O.O",
+        "..O..",
+        "O.O..",
+        "OO..."
+    ]),
+    // Shillelagh (still)
+    new LifePattern([
+        "OO...",
+        "O..OO",
+        ".OO.O"
+    ]),
+    // Long ship (still)
+    new LifePattern([
+        "OO..",
+        "O.O.",
+        ".O.O",
+        "..OO"
+    ]),
+    // Paperclip (still)
+    new LifePattern([
+        "..OO.",
+        ".O..O",
+        ".O.OO",
+        "OO.O.",
+        "O..O.",
+        ".OO.."
+    ]),
+    // Aircraft carrier aka carrier (still)
+    new LifePattern([
+        "OO..",
+        "O..O",
+        "..OO"
+    ]),
+    // Long barge (still)
+    new LifePattern([
+        ".O...",
+        "O.O..",
+        ".O.O.",
+        "..O.O",
+        "...O."
+    ]),
+    // Mango aka cigar (still)
+    new LifePattern([
+        ".OO..",
+        "O..O.",
+        ".O..O",
+        "..OO."
+    ]),
+    // Bi-loaf 1 aka half bakery aka loaf on loaf (still)
+    new LifePattern([
+        ".O.....",
+        "O.O....",
+        "O..O...",
+        ".OO.O..",
+        "...O.O.",
+        "...O..O",
+        "....OO."
+    ]),
+    // Barge (still)
+    new LifePattern([
+        ".O..",
+        "O.O.",
+        ".O.O",
+        "..O."
+    ]),
+    // Ship-tie (still)
+    new LifePattern([
+        "OO....",
+        "O.O...",
+        ".OO...",
+        "...OO.",
+        "...O.O",
+        "....OO",
+    ]),
+    // Long boat (still)
+    new LifePattern([
+        ".O..",
+        "O.O.",
+        ".O.O",
+        "..OO"
+    ]),
+    // Ship (still)
+    new LifePattern([
+        "OO.",
+        "O.O",
+        ".OO"
+    ]),
+    // Pond (still, eventually)
+    // The starting shape is known as a prepond
+    new LifePattern([
+        ".O.",
+        "OO.",
+        "..O"
+    ]),
+    // Tub (still)
+    new LifePattern([
+        ".O.",
+        "O.O",
+        ".O."
+    ]),
+    // Boat (still)
+    new LifePattern([
+        "OO.",
+        "O.O",
+        ".O."
+    ]),
+    // Loaf (still)
+    new LifePattern([
+        ".OO.",
+        "O..O",
+        ".O.O",
+        "..O."
+    ]),
+    // Tumbler (oscillator)
+    new LifePattern([
+        ".O.....O.",
+        "O.O...O.O",
+        "O..O.O..O",
+        "..O...O..",
+        "..OO.OO.."
+    ]),
+    // Blinker puffer 1 (puffer)
+    new LifePattern([
+        "...O.....",
+        ".O...O...",
+        "O........",
+        "O....O...",
+        "OOOOO....",
+        ".........",
+        ".........",
+        ".........",
+        ".OO......",
+        "OO.OOO...",
+        ".OOOO....",
+        "..OO.....",
+        ".........",
+        ".....OO..",
+        "...O....O",
+        "..O......",
+        "..O.....O",
+        "..OOOOOO."
+    ]),
     // 46P4H1V0 (spaceship)
     new LifePattern([
         "...O...........O...",
@@ -1011,4 +1846,5 @@ var patterns = [
         ".O."
     ]),
 ];
-// TODO: look into puffers
+// TODO: look into shapes on the wall / in the corner
+// TODO: find some oscillators that can be cut in half
