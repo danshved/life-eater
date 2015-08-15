@@ -466,7 +466,8 @@ var snake = {
 var cherry = {
     exists: false,
     x: 0,
-    y: 0
+    y: 0,
+    price: 1
 };
 
 var gameLogic = {
@@ -488,6 +489,7 @@ var gameLogic = {
         snake.reset();
 
         // Pick a random place for the cherry
+        cherry.price = 1;
         this.maybeSpawnCherry();
     },
 
@@ -514,8 +516,15 @@ var gameLogic = {
 
         // Snake grows when it eats the cherry
         if(cherry.exists && cherry.x == snake.head.x && cherry.y == snake.head.y) {
+            snake.desiredLength += cherry.price;
+            if(snake.desiredLength > snake.MAX_LENGTH) {
+                snake.desiredLength = snake.MAX_LENGTH;
+            }
+
             cherry.exists = false;
-            snake.desiredLength++;
+            if(cherry.price < 4) {
+                cherry.price *= 2;
+            }
         }
 
         // If the snake surrounded something, destroy all Life there
@@ -538,6 +547,9 @@ var gameLogic = {
                     }
                 }
             }
+
+            // Drop the cherry multiplier as penalty for biting self
+            cherry.price = 1;
         }
 
         // Respawn the cherry if it was eaten/destroyed

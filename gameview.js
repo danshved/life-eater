@@ -237,12 +237,17 @@ var hud = {
         this.setVisible(true);
 
         // Update all text objects
-        this.lengthText.text = snake.desiredLength;
+        this.lengthText.text = this.formatLength();
         this.scoreText.text = score;
-        this.levelText.text = (difficulty.level + 1);
+        this.levelText.text = difficulty.level + 1;
 
         // Draw the progress bar. Simply show the appropriate line of the spritesheet
         this.bar.frame = Math.floor(15.0 * difficulty.levelProgress());
+    },
+
+    formatLength: function() {
+        var length = snake.desiredLength.toString();
+        return (cherry.price == 1) ? length : (length + " (X" + cherry.price + ")")
     },
 
     // Hide or show the entire HUD
