@@ -146,9 +146,11 @@ var colony = {
     },
 
     // Choose a colony and determine when it will be spawned
-    generate: function() {
-        // Choose a pattern at random
-        var pattern = patterns[game.rnd.between(0, patterns.length - 1)];
+    generate: function(pattern) {
+        // Choose a pattern at random if one wasn't given
+        if(!pattern) {
+            pattern = patterns[game.rnd.between(0, patterns.length - 1)];
+        }
 
         // Copy the pattern to our memory, and apply a random
         // rotation/reflection.
@@ -477,8 +479,9 @@ var gameLogic = {
         // Empty the Life
         life.reset();
 
-        // Plan the first colony drop
-        colony.generate();
+        // Plan the first colony drop. Always drop the same colony first (2x2 block).
+        // All subsequent ones will be chosen at random
+        colony.generate(patterns[0]);
         colony.spawnTick = colony.FIRST_DELAY;
 
         // Put the snake in start position
