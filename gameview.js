@@ -175,6 +175,9 @@ var grid = {
 
 // Information above the game field: the current score etc.
 var hud = {
+    // Cherry frame position in the spritesheet
+    CHERRY_FRAME: 7,
+
     // Y coordinate of the text (vertical anchor is text center)
     TEXT_Y: 17,
 
@@ -183,9 +186,8 @@ var hud = {
 
     // Position of the level progress bar
     BAR_X: 270,
-    BAR_Y: 6,
-    BAR_SIZE_X: 90,
-    BAR_SIZE_Y: 6,
+    CHERRY_X: 135,
+    ICONS_Y: 6,
 
     // Font to use for all HUD text
     style: {
@@ -197,9 +199,13 @@ var hud = {
     scoreText: null,
     lengthText: null,
     levelText: null,
+    cherryText: null,
 
-    // Graphics object for the level progress bar
+    // Difficulty progress bar
     bar: null,
+
+    // Cherry icon near the cherry price
+    cherry: null,
 
     // Bar background sprite, i.e. the "icons"
     background: null,
@@ -210,13 +216,21 @@ var hud = {
         this.background = game.add.sprite(0, 0, 'hud-bg');
 
         // Progress bar for the difficulty level
-        this.bar = game.add.sprite(this.BAR_X, this.BAR_Y, 'hud-bar');
+        this.bar = game.add.sprite(this.BAR_X, this.ICONS_Y, 'hud-bar');
 
-        // Snake length display
+        // Cherry icon for the cherry price
+        this.cherry = game.add.sprite(this.CHERRY_X, this.ICONS_Y, 'cell', this.CHERRY_FRAME);
+
+        // Snake length
         this.lengthText = game.add.text(40 + this.X_GAP, this.TEXT_Y, '0', this.style);
         this.lengthText.anchor.set(0.0, 0.5);
 
-        // Score display
+        // Cherry multiplier
+        this.cherryText = game.add.text(this.CHERRY_X + 13 + this.X_GAP, this.TEXT_Y,
+            '0', this.style);
+        this.cherryText.anchor.set(0.0, 0.5);
+
+        // Score
         this.scoreText = game.add.text(game.width - 40 - this.X_GAP, this.TEXT_Y,
             '0', this.style);
         this.scoreText.anchor.set(1.0, 0.5);
@@ -237,17 +251,13 @@ var hud = {
         this.setVisible(true);
 
         // Update all text objects
-        this.lengthText.text = this.formatLength();
+        this.lengthText.text = snake.desiredLength;
+        this.cherryText.text = "X" + cherry.price; // TODO: don't allocate string each time?
         this.scoreText.text = score;
         this.levelText.text = difficulty.level + 1;
 
         // Draw the progress bar. Simply show the appropriate line of the spritesheet
         this.bar.frame = Math.floor(15.0 * difficulty.levelProgress());
-    },
-
-    formatLength: function() {
-        var length = snake.desiredLength.toString();
-        return (cherry.price == 1) ? length : (length + " (X" + cherry.price + ")")
     },
 
     // Hide or show the entire HUD
@@ -257,6 +267,10 @@ var hud = {
         this.scoreText.visible = value;
         this.levelText.visible = value;
         this.bar.visible = value;
+
+        var showCherry = value && cherry.exists && (cherry.price != 1);
+        this.cherry.visible = showCherry;
+        this.cherryText.visible = showCherry;
     }
 
 };

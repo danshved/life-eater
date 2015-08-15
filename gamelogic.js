@@ -523,7 +523,7 @@ var gameLogic = {
 
             cherry.exists = false;
             if(cherry.price < 4) {
-                cherry.price *= 2;
+                cherry.price++;
             }
         }
 
