@@ -1,40 +1,33 @@
 // patterns.js
 // A collection of Life patterns that can be spawned on the field during the
-// game
+// game. This is the collection in raw form. When game loads, it is transformed
+// into a more usable level-indexed database in lifebase.js.
 
-function LifePattern(charImage) {
-    this.sizeY = charImage.length;
-    this.sizeX = charImage[0].length;
-    this.cells = [];
-
-    for(var x = 0; x < this.sizeX; x++) {
-        for(var y = 0; y < this.sizeY; y++) {
-            this.cells.push(charImage[y][x] != '.');
-        }
-    }
-}
-
-LifePattern.prototype.cellAt = function(x, y) {
-    return this.cells[x * this.sizeY + y];
-}
-
-var patterns = [
-    // Block (still)
-    new LifePattern([
+var rawPatterns = [
+{
+    name: "block",
+    kind: "still",
+    cells: [
         "OO",
         "OO"
-    ]),
-    // Beehive at beehive (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "beehive at beehive",
+    kind: "still",
+    cells: [
         "....O.",
         "...O.O",
         "...O.O",
         ".OO.O.",
         "O..O..",
         ".OO..."
-    ]),
-    // Ship on long boat (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "ship on long boat",
+    kind: "still",
+    cells: [
         "OO.....",
         "O.O....",
         ".OO....",
@@ -42,9 +35,12 @@ var patterns = [
         "...O.O.",
         "....O.O",
         ".....O."
-    ]),
-    // Cis-R-bee and R-loaf (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "cis-R-bee and R-loaf",
+    kind: "still",
+    cells: [
         ".OO.",
         "O..O",
         ".OOO",
@@ -53,27 +49,36 @@ var patterns = [
         "O..O",
         "O.O.",
         ".O.."
-    ]),
-    // Beehive with nine (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "beehive with nine",
+    kind: "still",
+    cells: [
         ".OO....",
         "O..O...",
         ".OO.O..",
         "....O..",
         "....O.O",
         ".....OO"
-    ]),
-    // Beehive bend tail (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "beehive bend tail",
+    kind: "still",
+    cells: [
         ".OO..",
         "O..O.",
         ".OO.O",
         "....O",
         ".OOO.",
         ".O..."
-    ]),
-    // Ortho-loaf and table (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "ortho-loaf and table",
+    kind: "still",
+    cells: [
         "..O..",
         ".O.O.",
         ".O..O",
@@ -81,18 +86,24 @@ var patterns = [
         ".....",
         "OOOO.",
         "O..O."
-    ]),
-    // Trans-boat with nine (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "trans-boat with nine",
+    kind: "still",
+    cells: [
         "OO....",
         "O.O...",
         ".O....",
         "..OOO.",
         ".....O",
         "....OO"
-    ]),
-    // Beehive and cap (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "beehive and cap",
+    kind: "still",
+    cells: [
         ".OO..",
         "O..O.",
         "OOOO.",
@@ -100,62 +111,83 @@ var patterns = [
         "..OO.",
         ".O..O",
         "..OO."
-    ]),
-    // Long long barge (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "long long barge",
+    kind: "still",
+    cells: [
         ".O....",
         "O.O...",
         ".O.O..",
         "..O.O.",
         "...O.O",
         "....O."
-    ]),
-    // Trans-barge with tail (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "trans-barge with tail",
+    kind: "still",
+    cells: [
         "OO....",
         ".O....",
         ".O.O..",
         "..O.O.",
         "...O.O",
         "....O."
-    ]),
-    // Snorkel loop (stil)
-    new LifePattern([
+    ]
+},
+{
+    name: "snorkel loop",
+    kind: "still",
+    cells: [
         "..OO..",
         ".O..O.",
         "..O.O.",
         "O.O.OO",
         "OO...."
-    ]),
-    // Beehive and table (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "beehive and table",
+    kind: "still",
+    cells: [
         "..OO.",
         ".O..O",
         "..OO.",
         ".....",
         "OOOO.",
         "O..O."
-    ]),
-    // Cis-boat and table (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "cis-boat and table",
+    kind: "still",
+    cells: [
         ".O..",
         "O.O.",
         "OO..",
         "....",
         "OOOO",
         "O..O"
-    ]),
-    // R-bee and snake (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "r-bee and snake",
+    kind: "still",
+    cells: [
         "OO.O.",
         "O.OO.",
         ".....",
         ".OOO.",
         ".O..O",
         "..OO."
-    ]),
-    // Eater on boat (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "eater on boat",
+    kind: "still",
+    cells: [
         ".OO..",
         ".O.O.",
         "...O.",
@@ -163,9 +195,12 @@ var patterns = [
         ".OO..",
         "O.O..",
         ".O..."
-    ]),
-    // Trans-boat and dock (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "trans-boat and dock",
+    kind: "still",
+    cells: [
         ".O....",
         "O.O...",
         ".OO...",
@@ -173,9 +208,12 @@ var patterns = [
         ".OOOO.",
         "O....O",
         "OO..OO"
-    ]),
-    // Long long canoe (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "long long canoe",
+    kind: "still",
+    cells: [
         ".....OO",
         "......O",
         ".....O.",
@@ -183,18 +221,24 @@ var patterns = [
         "...O...",
         "O.O....",
         "OO....."
-    ]),
-    // Long canoe (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "long canoe",
+    kind: "still",
+    cells: [
         "....OO",
         ".....O",
         "....O.",
         "...O..",
         "O.O...",
         "OO...."
-    ]),
-    // Trans-rotated R-bee (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "trans-rotated R-bee",
+    kind: "still",
+    cells: [
         ".O.....",
         "O.O....",
         "O.O....",
@@ -202,83 +246,113 @@ var patterns = [
         "....O.O",
         "....O.O",
         ".....O."
-    ]),
-    // Bee hat (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "bee hat",
+    kind: "still",
+    cells: [
         ".OO...",
         "O..O..",
         ".OO.O.",
         "..O.O.",
         "O.O.OO",
         "OO...."
-    ]),
-    // Cis-loaf with tail (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "cis-loaf with tail",
+    kind: "still",
+    cells: [
         "...OO.",
         "..O..O",
         ".O.O.O",
         ".O..O.",
         "OO...."
-    ]),
-    // Symmetric scorpion (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "symmetric scorpion",
+    kind: "still",
+    cells: [
         "...O...",
         ".OOOOO.",
         "O.....O",
         "O.O.O.O",
         ".OO.OO."
-    ]),
-    // Claw with tail (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "claw with tail",
+    kind: "still",
+    cells: [
         "OO....",
         ".O....",
         ".O.OO.",
         "..O..O",
         "....OO"
-    ]),
-    // Eleven loop (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "eleven loop",
+    kind: "still",
+    cells: [
         ".O...",
         "O.O..",
         "O..O.",
         ".O.O.",
         "OO.OO"
-    ]),
-    // Long integral (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "long integral",
+    kind: "still",
+    cells: [
         "..OO",
         ".O.O",
         ".O..",
         "..O.",
         "O.O.",
         "OO.."
-    ]),
-    // Hook with tail (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "hook with tail",
+    kind: "still",
+    cells: [
         "OO...",
         ".O...",
         ".O.OO",
         "..O.O"
-    ]),
-    // Load siamese loaf (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "load siamese loaf",
+    kind: "still",
+    cells: [
         "..OO.",
         ".O..O",
         "O.O.O",
         "O..O.",
         ".OO.."
-    ]),
-    // Tub with long tail (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "tub with long tail",
+    kind: "still",
+    cells: [
         ".O..",
         "O.O.",
         ".O.O",
         "...O",
         "..O.",
         "..OO"
-    ]),
-    // Beehive at loaf (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "beehive at loaf",
+    kind: "still",
+    cells: [
         "....O.",
         "...O.O",
         "...O.O",
@@ -286,9 +360,12 @@ var patterns = [
         "O..O..",
         "O.O...",
         ".O...."
-    ]),
-    // Cis-hook and R-bee (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "cis-hook and R-bee",
+    kind: "still",
+    cells: [
         "..OO",
         "O..O",
         "OOO.",
@@ -296,16 +373,22 @@ var patterns = [
         "OOO.",
         "O..O",
         ".OO."
-    ]),
-    // Boat with long tail (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "boat with long tail",
+    kind: "still",
+    cells: [
         "OO....",
         "O.O...",
         ".O..OO",
         "..OO.O"
-    ]),
-    // Trans-R-bee and R-loaf (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "trans-R-bee and R-loaf",
+    kind: "still",
+    cells: [
         "..OO.",
         ".O..O",
         ".OOO.",
@@ -314,40 +397,55 @@ var patterns = [
         "O..O.",
         "O.O..",
         ".O..."
-    ]),
-    // Long long shillelagh (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "long long shillelagh",
+    kind: "still",
+    cells: [
         ".....OO",
         "OO..O.O",
         "O..O...",
         ".OO...."
-    ]),
-    // Long shillelagh (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "long shillelagh",
+    kind: "still",
+    cells: [
         "OO..OO",
         "O..O.O",
         ".OO..."
-    ]),
-    // Integral with tub (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "integral with tub",
+    kind: "still",
+    cells: [
         "OO....",
         "O.O...",
         "..O...",
         "..O.O.",
         "...O.O",
         "....O."
-    ]),
-    // Cis-block and long hook (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "cis-block and long hook",
+    kind: "still",
+    cells: [
         "...OO",
         "O...O",
         "OOOO.",
         ".....",
         "..OO.",
         "..OO."
-    ]),
-    // Eater siamese eater (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "eater siamese eater",
+    kind: "still",
+    cells: [
         "OO..",
         "O.O.",
         "..O.",
@@ -355,9 +453,12 @@ var patterns = [
         "...O",
         "OOO.",
         "O..."
-    ]),
-    // Cis-boat and dock (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "cis-boat and dock",
+    kind: "still",
+    cells: [
         "..O...",
         ".O.O..",
         ".OO...",
@@ -365,17 +466,23 @@ var patterns = [
         ".OOOO.",
         "O....O",
         "OO..OO"
-    ]),
-    // Block and two walls (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "block and two walls",
+    kind: "still",
+    cells: [
         "OO.OO",
         "OO.O.",
         "...O.",
         "OOO..",
         "O...."
-    ]),
-    // Trans-hook and R-bee (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "trans-hook and R-bee",
+    kind: "still",
+    cells: [
         "...OO",
         ".O..O",
         ".OOO.",
@@ -383,9 +490,12 @@ var patterns = [
         ".OOO.",
         "O..O.",
         ".OO.."
-    ]),
-    // Mirrored dock (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "mirrored dock",
+    kind: "still",
+    cells: [
         "OO..OO",
         "O....O",
         ".OOOO.",
@@ -393,124 +503,169 @@ var patterns = [
         ".OOOO.",
         "O....O",
         "OO..OO"
-    ]),
-    // Cis-shillelagh (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "cis-shillelagh",
+    kind: "still",
+    cells: [
         "....OO",
         ".....O",
         "OO..O.",
         "O..O..",
         ".OO..."
-    ]),
-    // Trans-block and long hook (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "trans-block and long hook",
+    kind: "still",
+    cells: [
         "...OO",
         "O...O",
         "OOOO.",
         ".....",
         "OO...",
         "OO..."
-    ]),
-    // Cis-rotated hook (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "cis-rotated hook",
+    kind: "still",
+    cells: [
         ".OO....",
         "..O..OO",
         "O.O.O.O",
         "Oo..O..",
         "....OO."
-    ]),
-    // Trans-loaf with tail (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "trans-loaf with tail",
+    kind: "still",
+    cells: [
         "OO....",
         ".O....",
         ".O.OO.",
         "..O..O",
         "...O.O",
         "....O."
-    ]),
-    // Block and cap (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "block and cap",
+    kind: "still",
+    cells: [
         ".OO.",
         "O..O",
         "OOOO",
         "....",
         "OO..",
         "OO.."
-    ]),
-    // Elevener (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "elevener",
+    kind: "still",
+    cells: [
         "....OO",
         "...O.O",
         "...O..",
         ".OOO..",
         "O.....",
         "OO...."
-    ]),
-    // Bookends (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "bookends",
+    kind: "still",
+    cells: [
         "OO...OO",
         "O.O.O.O",
         "..O.O..",
         ".OO.OO."
-    ]),
-    // Dead spark coil (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "dead spark coil",
+    kind: "still",
+    cells: [
         "OO...OO",
         "O.O.O.O",
         "..O.O..",
         "O.O.O.O",
         "OO...OO"
-    ]),
-    // Trans-mirrored R-bee (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "trans-mirrored R-bee",
+    kind: "still",
+    cells: [
         ".....O.",
         ".OO.O.O",
         "O.O.O.O",
         "O.O.OO.",
         ".O....."
-    ]),
-    // Cis-boat with tail (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "cis-boat with tail",
+    kind: "still",
+    cells: [
         "...OO",
         "...O.",
         "OO.O.",
         "O.O..",
         ".O..."
-    ]),
-    // Fourteener (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "fourteener",
+    kind: "still",
+    cells: [
         "....OO.",
         "OO..O.O",
         "O.....O",
         ".OOOOO.",
         "...O..."
-    ]),
-    // Loop (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "loop",
+    kind: "still",
+    cells: [
         ".OO..",
         "O..O.",
         ".O.O.",
         "OO.OO"
-    ]),
-    // Scorpion (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "scorpion",
+    kind: "still",
+    cells: [
         "...O...",
         ".OOO...",
         "O...OO.",
         "O.O.O.O",
         ".OO.O.O",
         ".....O."
-    ]),
-    // Beehive with tail (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "beehive with tail",
+    kind: "still",
+    cells: [
         ".OO...",
         "O..O..",
         ".OO.O.",
         "....O.",
         "....OO"
-    ]),
-    // Beehive and dock (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "beehive and dock",
+    kind: "still",
+    cells: [
         "...OO.",
         "..O..O",
         "...OO.",
@@ -518,113 +673,155 @@ var patterns = [
         ".OOOO.",
         "O....O",
         "OO..OO"
-    ]),
-    // Twin hat (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "twin hat",
+    kind: "still",
+    cells: [
         "..O...O..",
         ".O.O.O.O.",
         ".O.O.O.O.",
         "OO.O.O.OO",
         "....O...."
-    ]),
-    // Block and dock (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "block and dock",
+    kind: "still",
+    cells: [
         "...OO.",
         "...OO.",
         "......",
         ".OOOO.",
         "O....O",
         "OO..OO"
-    ]),
-    // Block on table (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "block on table",
+    kind: "still",
+    cells: [
         "..OO",
         "..OO",
         "....",
         "OOOO",
         "O..O"
-    ]),
-    // Moose antlers (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "moose antlers",
+    kind: "still",
+    cells: [
         "OO.....OO",
         "O.......O",
         ".OOO.OOO.",
         "...O.O...",
         "....O...."
-    ]),
-    // Cis-mirrored R-bee (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "cis-mirrored R-bee",
+    kind: "still",
+    cells: [
         ".OO.OO.",
         "O.O.O.O",
         "O.O.O.O",
         ".O...O."
-    ]),
-    // Alternate table on table (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "alternate table on table",
+    kind: "still",
+    cells: [
         "O..O..",
         "OOOO..",
         "......",
         "..OOOO",
         "..O..O"
-    ]),
-    // Table on table (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "table on table",
+    kind: "still",
+    cells: [
         "O..O",
         "OOOO",
         "....",
         "OOOO",
         "O..O"
-    ]),
-    // Long long ship (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "long long ship",
+    kind: "still",
+    cells: [
         "OO...",
         "O.O..",
         ".O.O.",
         "..O.O",
         "...OO"
-    ]),
-    // Tub with tail (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "tub with tail",
+    kind: "still",
+    cells: [
         ".O...",
         "O.O..",
         ".O.O.",
         "...O.",
         "...OO"
-    ]),
-    // Long long boat (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "long long boat",
+    kind: "still",
+    cells: [
         ".O...",
         "O.O..",
         ".O.O.",
         "..O.O",
         "...OO"
-    ]),
-    // Boat-ship-tie (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "boat-ship-tie",
+    kind: "still",
+    cells: [
         "OO....",
         "O.O...",
         ".OO...",
         "...OO.",
         "...O.O",
         "....O.",
-    ]),
-    // Hat (still)
-    new LifePattern([
+]
+},
+{
+    name: "hat",
+    kind: "still",
+    cells: [
         "..O..",
         ".O.O.",
         ".O.O.",
         "OO.OO"
-    ]),
-    // Trans-boat with tail (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "trans-boat with tail",
+    kind: "still",
+    cells: [
         "OO...",
         "O.O..",
         ".O.O.",
         "...O.",
         "...OO"
-    ]),
-    // Bi-pond (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "bi-pond",
+    kind: "still",
+    cells: [
         ".OO....",
         "O..O...",
         "O..O...",
@@ -632,141 +829,198 @@ var patterns = [
         "...O..O",
         "...O..O",
         "....OO."
-    ]),
-    // Big S (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "big S",
+    kind: "still",
+    cells: [
         "....OO.",
         "...O..O",
         "...O.OO",
         "OO.O...",
         "O..O...",
         ".OO...."
-    ]),
-    // Snake bridge snake (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "snake bridge snake",
+    kind: "still",
+    cells: [
         "....OO",
         "....O.",
         ".....O",
         "....OO",
         "OO.O..",
         "O.OO.."
-    ]),
-    // Carrier siamese snake (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "carrier siamese snake",
+    kind: "still",
+    cells: [
         "OO.OO..",
         "O.OO..O",
         ".....OO"
-    ]),
-    // Snake siamese snake (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "snake siamese snake",
+    kind: "still",
+    cells: [
         "OO.OO.O",
         "O.OO.OO"
-    ]),
-    // Canoe (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "canoe",
+    kind: "still",
+    cells: [
         "...OO",
         "....O",
         "...O.",
         "O.O..",
         "OO..."
-    ]),
-    // Extra extra long snake (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "extra extra long snake",
+    kind: "still",
+    cells: [
         "OO......",
         "O.O.....",
         "...O....",
         "....O...",
         ".....O.O",
         "......OO"
-    ]),
-    // Extra long snake (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "extra long snake",
+    kind: "still",
+    cells: [
         "OO.....",
         "O.O....",
         "...O...",
         "....O.O",
         ".....OO"
-    ]),
-    // Long long snake (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "long long snake",
+    kind: "still",
+    cells: [
         "OO....",
         "O.O...",
         "...O.O",
         "....OO"
-    ]),
-    // Long snake (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "long snake",
+    kind: "still",
+    cells: [
         "OO...",
         "O.O.O",
         "...OO"
-    ]),
-    // Snake (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "snake",
+    kind: "still",
+    cells: [
         "OO.O",
         "O.OO"
-    ]),
-    // Boat-tie (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "boat-tie",
+    kind: "still",
+    cells: [
         ".O....",
         "O.O...",
         ".OO...",
         "...OO.",
         "...O.O",
         "....O.",
-    ]),
-    // Integral sign (still)
-    new LifePattern([
+]
+},
+{
+    name: "integral sign",
+    kind: "still",
+    cells: [
         "...OO",
         "..O.O",
         "..O..",
         "O.O..",
         "OO..."
-    ]),
-    // Shillelagh (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "shillelagh",
+    kind: "still",
+    cells: [
         "OO...",
         "O..OO",
         ".OO.O"
-    ]),
-    // Long ship (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "long ship",
+    kind: "still",
+    cells: [
         "OO..",
         "O.O.",
         ".O.O",
         "..OO"
-    ]),
-    // Paperclip (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "paperclip",
+    kind: "still",
+    cells: [
         "..OO.",
         ".O..O",
         ".O.OO",
         "OO.O.",
         "O..O.",
         ".OO.."
-    ]),
-    // Aircraft carrier aka carrier (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "aircraft carrier aka carrier",
+    kind: "still",
+    cells: [
         "OO..",
         "O..O",
         "..OO"
-    ]),
-    // Long barge (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "long barge",
+    kind: "still",
+    cells: [
         ".O...",
         "O.O..",
         ".O.O.",
         "..O.O",
         "...O."
-    ]),
-    // Mango aka cigar (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "mango aka cigar",
+    kind: "still",
+    cells: [
         ".OO..",
         "O..O.",
         ".O..O",
         "..OO."
-    ]),
-    // Bi-loaf 1 aka half bakery aka loaf on loaf (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "bi-loaf 1 aka half bakery aka loaf on loaf",
+    kind: "still",
+    cells: [
         ".O.....",
         "O.O....",
         "O..O...",
@@ -774,72 +1028,101 @@ var patterns = [
         "...O.O.",
         "...O..O",
         "....OO."
-    ]),
-    // Barge (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "barge",
+    kind: "still",
+    cells: [
         ".O..",
         "O.O.",
         ".O.O",
         "..O."
-    ]),
-    // Ship-tie (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "ship-tie",
+    kind: "still",
+    cells: [
         "OO....",
         "O.O...",
         ".OO...",
         "...OO.",
         "...O.O",
         "....OO",
-    ]),
-    // Long boat (still)
-    new LifePattern([
+]
+},
+{
+    name: "long boat",
+    kind: "still",
+    cells: [
         ".O..",
         "O.O.",
         ".O.O",
         "..OO"
-    ]),
-    // Ship (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "ship",
+    kind: "still",
+    cells: [
         "OO.",
         "O.O",
         ".OO"
-    ]),
-    // Pond (still, eventually)
-    // The starting shape is known as a prepond
-    new LifePattern([
+    ]
+},
+{
+    name: "prepond",
+    kind: "still", // eventually turns into a pond
+    cells: [
         ".O.",
         "OO.",
         "..O"
-    ]),
-    // Tub (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "tub",
+    kind: "still",
+    cells: [
         ".O.",
         "O.O",
         ".O."
-    ]),
-    // Boat (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "boat",
+    kind: "still",
+    cells: [
         "OO.",
         "O.O",
         ".O."
-    ]),
-    // Loaf (still)
-    new LifePattern([
+    ]
+},
+{
+    name: "loaf",
+    kind: "still",
+    cells: [
         ".OO.",
         "O..O",
         ".O.O",
         "..O."
-    ]),
-    // Tumbler (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "tumbler",
+    kind: "oscillator",
+    cells: [
         ".O.....O.",
         "O.O...O.O",
         "O..O.O..O",
         "..O...O..",
         "..OO.OO.."
-    ]),
-    // Blinker puffer 1 (puffer)
-    new LifePattern([
+    ]
+},
+{
+    name: "blinker puffer 1",
+    kind: "puffer",
+    cells: [
         "...O.....",
         ".O...O...",
         "O........",
@@ -858,9 +1141,12 @@ var patterns = [
         "..O......",
         "..O.....O",
         "..OOOOOO."
-    ]),
-    // 46P4H1V0 (spaceship)
-    new LifePattern([
+    ]
+},
+{
+    name: "46P4H1V0",
+    kind: "spaceship",
+    cells: [
         "...O...........O...",
         "...O...........O...",
         "..O.O.........O.O..",
@@ -871,10 +1157,12 @@ var patterns = [
         "O.......O.O.......O",
         "O.................O",
         ".O.OO.OO...OO.OO.O."
-    ]),
-    // 44P5H2V0 (spaceship)
-    // Leaves two blocks at the wall
-    new LifePattern([
+    ]
+},
+{
+    name: "44P5H2V0",
+    kind: "spaceship",
+    cells: [
         "....O.....O....",
         "...OOO...OOO...",
         "..O..O...O..O..",
@@ -886,9 +1174,13 @@ var patterns = [
         "OO...O...O...OO",
         "..O..O...O..O..",
         "....O.....O...."
-    ]),
-    // X66 (spaceship)
-    new LifePattern([
+    ]
+    // Leaves two blocks at the wall
+},
+{
+    name: "x66",
+    kind: "spaceship",
+    cells: [
         "..O......",
         "OO.......",
         "O..OOO..O",
@@ -900,10 +1192,12 @@ var patterns = [
         "O..OOO..O",
         "OO.......",
         "..O......",
-    ]),
-    // Weekender (spaceship)
-    // Disappears at the wall
-    new LifePattern([
+    ]
+},
+{
+    name: "weekender",
+    kind: "spaceship",
+    cells: [
         ".O............O.",
         ".O............O.",
         "O.O..........O.O",
@@ -915,9 +1209,12 @@ var patterns = [
         "................",
         "....O......O....",
         ".....OO..OO....."
-    ]),
-    // Turtle (spaceship)
-    new LifePattern([
+    ]
+},
+{
+    name: "turtle",
+    kind: "spaceship",
+    cells: [
         ".OOO.......O",
         ".OO..O.OO.OO",
         "...OOO....O.",
@@ -928,9 +1225,12 @@ var patterns = [
         "...OOO....O.",
         ".OO..O.OO.OO",
         ".OOO.......O",
-    ]),
-    // Sidecar (spaceship)
-    new LifePattern([
+]
+},
+{
+    name: "sidecar",
+    kind: "spaceship",
+    cells: [
         ".O......",
         "O.....O.",
         "O.....O.",
@@ -941,9 +1241,12 @@ var patterns = [
         ".O......",
         ".O.....O",
         ".OOOOOO."
-    ]),
-    // Schick engine (spaceship)
-    new LifePattern([
+    ]
+},
+{
+    name: "schick engine",
+    kind: "spaceship",
+    cells: [
         ".O..O...............",
         "O...................",
         "O...O...............",
@@ -955,9 +1258,12 @@ var patterns = [
         "O...O...............",
         "O...................",
         ".O..O...............",
-    ]),
-    // Pushalong 1 (spaceship)
-    new LifePattern([
+]
+},
+{
+    name: "pushalong 1",
+    kind: "spaceship",
+    cells: [
         "...O.......",
         ".O..O......",
         "O...O......",
@@ -970,9 +1276,12 @@ var patterns = [
         "......OOOOO",
         ".....OO.OOO",
         "......OO..."
-    ]),
-    // Pufferfish (puffer)
-    new LifePattern([
+    ]
+},
+{
+    name: "pufferfish",
+    kind: "puffer",
+    cells: [
         "...O.......O...",
         "..OOO.....OOO..",
         ".OO..O...O..OO.",
@@ -985,9 +1294,12 @@ var patterns = [
         "......O.O......",
         "...O.O...O.O...",
         "....O.....O...."
-    ]),
-    // Orion 2 (spaceship)
-    new LifePattern([
+    ]
+},
+{
+    name: "orion 2",
+    kind: "spaceship",
+    cells: [
         ".OO..........",
         "OO...........",
         "..O..........",
@@ -1001,9 +1313,12 @@ var patterns = [
         "...OO.O......",
         "......O......",
         "....OO......."
-    ]),
-    // Orion (spaceship)
-    new LifePattern([
+    ]
+},
+{
+    name: "orion",
+    kind: "spaceship",
+    cells: [
         "...OO.........",
         "...O.O........",
         "...O..........",
@@ -1019,9 +1334,12 @@ var patterns = [
         "....OO.O......",
         ".......O......",
         ".....OO......."
-    ]),
-    // Hivenudger (spaceship)
-    new LifePattern([
+    ]
+},
+{
+    name: "hivenudger",
+    kind: "spaceship",
+    cells: [
         "OOOO.....O..O",
         "O...O...O....",
         "O.......O...O",
@@ -1035,9 +1353,12 @@ var patterns = [
         "O.......O...O",
         "O...O...O....",
         "OOOO.....O..O",
-    ]),
-    // Edge-repair spaceship 1 (spaceship)
-    new LifePattern([
+]
+},
+{
+    name: "edge-repair spaceship 1",
+    kind: "spaceship",
+    cells: [
         "........O.......",
         ".......OOOO.....",
         "..O...O...OO.OO.",
@@ -1045,9 +1366,12 @@ var patterns = [
         "O...O.......O..O",
         ".O.O..O.........",
         ".....O.........."
-    ]),
-    // Dart (spaceship)
-    new LifePattern([
+    ]
+},
+{
+    name: "dart",
+    kind: "spaceship",
+    cells: [
         ".......O.......",
         "......O.O......",
         ".....O...O.....",
@@ -1058,9 +1382,12 @@ var patterns = [
         ".OO...O.O...OO.",
         "O.....O.O.....O",
         ".O.OO.O.O.OO.O."
-    ]),
-    // Crab (spaceship)
-    new LifePattern([
+    ]
+},
+{
+    name: "crab",
+    kind: "spaceship",
+    cells: [
         "........OO...",
         ".......OO....",
         ".........O...",
@@ -1073,9 +1400,12 @@ var patterns = [
         "..O....O.O...",
         "....OO..O....",
         "....OO......."
-    ]),
-    // Coe ship (spaceship)
-    new LifePattern([
+    ]
+},
+{
+    name: "coe ship",
+    kind: "spaceship",
+    cells: [
         "....OOOOOO",
         "..OO.....O",
         "OO.O.....O",
@@ -1085,9 +1415,12 @@ var patterns = [
         ".....OOOO.",
         ".....OO.OO",
         ".......OO."
-    ]),
-    // Canada goose (spaceship)
-    new LifePattern([
+    ]
+},
+{
+    name: "canada goose",
+    kind: "spaceship",
+    cells: [
         "OOO..........",
         "O.........OO.",
         ".O......OOO.O",
@@ -1100,9 +1433,12 @@ var patterns = [
         "..O....OO....",
         "..OO.........",
         "..OO........."
-    ]),
-    // B29 (spaceship)
-    new LifePattern([
+    ]
+},
+{
+    name: "b29",
+    kind: "spaceship",
+    cells: [
         "...OO...",
         "..OO....",
         "....O...",
@@ -1119,9 +1455,12 @@ var patterns = [
         ".....O.O",
         "......OO",
         "......O."
-    ]),
-    // 37P4H1V0 (spaceship)
-    new LifePattern([
+    ]
+},
+{
+    name: "37P4H1V0",
+    kind: "spaceship",
+    cells: [
         ".O.................",
         ".O........O........",
         "O.O.....O...O......",
@@ -1134,9 +1473,12 @@ var patterns = [
         "..................O",
         ".................O.",
         ".................O."
-    ]),
-    // 30P5H2V0 (spaceship)
-    new LifePattern([
+    ]
+},
+{
+    name: "30P5H2V0",
+    kind: "spaceship",
+    cells: [
         "....O........",
         "...OOO.......",
         "..OO.OO......",
@@ -1148,17 +1490,23 @@ var patterns = [
         "........O.O..",
         ".........O..O",
         "............O"
-    ]),
-    // 25P3H1V0.2 (spaceship)
-    new LifePattern([
+    ]
+},
+{
+    name: "25P3H1V0.2",
+    kind: "spaceship",
+    cells: [
         ".......OO.O.....",
         "....OO.O.OO.OOO.",
         ".OOOO..OO......O",
         "O....O...O...OO.",
         ".OO............."
-    ]),
-    // Queen bee shuttle (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "queen bee shuttle",
+    kind: "oscillator",
+    cells: [
         ".........O............",
         ".......O.O............",
         "......O.O.............",
@@ -1166,9 +1514,12 @@ var patterns = [
         "OO....O.O...........OO",
         ".......O.O............",
         ".........O............"
-    ]),
-    // Pentoad (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "pentoad",
+    kind: "oscillator",
+    cells: [
         "...........OO",
         "...........O.",
         ".........O.O.",
@@ -1181,9 +1532,12 @@ var patterns = [
         ".O.O.........",
         ".O...........",
         "OO..........."
-    ]),
-    // Elkies' p5 (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "elkies' p5",
+    kind: "oscillator",
+    cells: [
         ".O.......",
         "O..OOO...",
         "..O......",
@@ -1192,9 +1546,12 @@ var patterns = [
         "....O....",
         "....O.O..",
         ".....OO.."
-    ]),
-    // Eater/block frop (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "eater/block frop",
+    kind: "oscillator",
+    cells: [
         ".OO.......",
         "..O.......",
         "..O.O.....",
@@ -1205,9 +1562,12 @@ var patterns = [
         "...O......",
         "OOO.......",
         "O........."
-    ]),
-    // Confused eaters (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "confused eaters",
+    kind: "oscillator",
+    cells: [
         "O..........",
         "OOO........",
         "...O.......",
@@ -1219,9 +1579,12 @@ var patterns = [
         ".......O.O.",
         ".........O.",
         ".........OO"
-    ]),
-    // Two pulsar quadrants (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "two pulsar quadrants",
+    kind: "oscillator",
+    cells: [
         "....O....",
         "....O....",
         "...OO....",
@@ -1231,17 +1594,23 @@ var patterns = [
         "O....O...",
         ".........",
         "..OOO...."
-    ]),
-    // Spark coil (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "spark coil",
+    kind: "oscillator",
+    cells: [
         "OO....OO",
         "O.O..O.O",
         "..O..O..",
         "O.O..O.O",
         "OO....OO"
-    ]),
-    // Pulsar quadrant (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "pulsar quadrant",
+    kind: "oscillator",
+    cells: [
         ".....O..",
         "...OOO..",
         "..O...OO",
@@ -1250,17 +1619,23 @@ var patterns = [
         "O....O..",
         "........",
         "..OOO..."
-    ]),
-    // Monogram (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "monogram",
+    kind: "oscillator",
+    cells: [
         "OO...OO",
         ".O.O.O.",
         ".OO.OO.",
         ".O.O.O.",
         "OO...OO"
-    ]),
-    // French kiss (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "french kiss",
+    kind: "oscillator",
+    cells: [
         "O.........",
         "OOO.......",
         "...O......",
@@ -1270,9 +1645,12 @@ var patterns = [
         "......O...",
         ".......OOO",
         ".........O"
-    ]),
-    // Cuphook (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "cuphook",
+    kind: "oscillator",
+    cells: [
         "....OO...",
         "OO.O.O...",
         "OO.O.....",
@@ -1281,25 +1659,34 @@ var patterns = [
         "....OO.O.",
         ".......O.",
         ".......OO"
-    ]),
-    // Cis-boat and long hook eating tub (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "cis-boat and long hook eating tub",
+    kind: "oscillator",
+    cells: [
         ".....O.....",
         ".O.OO.O.OO.",
         "O.O...O.O.O",
         ".O....O..O.",
         ".....OO...."
-    ]),
-    // Beehive and long hook eating tub (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "beehive and long hook eating tub",
+    kind: "oscillator",
+    cells: [
         ".....O...O.",
         ".O.OO.O.O.O",
         "O.O...O.O.O",
         ".O....O..O.",
         ".....OO...."
-    ]),
-    // Achim's p8 (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "achim's p8",
+    kind: "oscillator",
+    cells: [
         ".OO......",
         "O........",
         ".O...O...",
@@ -1309,9 +1696,12 @@ var patterns = [
         "...O...O.",
         "........O",
         "......OO."
-    ]),
-    // Smiley (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "smiley",
+    kind: "oscillator",
+    cells: [
         "OOO.OOO",
         ".O.O.O.",
         ".......",
@@ -1319,9 +1709,12 @@ var patterns = [
         ".......",
         "O.O.O.O",
         "..O.O.."
-    ]),
-    // Fumarole (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "fumarole",
+    kind: "oscillator",
+    cells: [
         "...OO...",
         ".O....O.",
         ".O....O.",
@@ -1329,9 +1722,12 @@ var patterns = [
         "..O..O..",
         "O.O..O.O",
         "OO....OO"
-    ]),
-    // Silver's p5 (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "silver's p5",
+    kind: "oscillator",
+    cells: [
         "OO.........",
         "O..........",
         ".O..O......",
@@ -1339,9 +1735,12 @@ var patterns = [
         "...O...O.OO",
         "..O....OO.O",
         "..OO......."
-    ]),
-    // Griddle and beehive (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "griddle and beehive",
+    kind: "oscillator",
+    cells: [
         "...O..",
         ".O.O..",
         "O....O",
@@ -1350,18 +1749,24 @@ var patterns = [
         "..OO..",
         ".O..O.",
         "..OO.."
-    ]),
-    // Coe's p8 (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "coe's p8",
+    kind: "oscillator",
+    cells: [
         "OO..........",
         "OO..OO......",
         ".....OO.....",
         "....O..O....",
         ".......O..OO",
         ".....O.O..OO"
-    ]),
-    // Almosymmetric (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "almosymmetric",
+    kind: "oscillator",
+    cells: [
         "....O....",
         "OO..O.O..",
         "O.O......",
@@ -1370,9 +1775,12 @@ var patterns = [
         "O......O.",
         "OO.O.O...",
         ".....O..."
-    ]),
-    // Unix (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "unix",
+    kind: "oscillator",
+    cells: [
         ".OO.....",
         ".OO.....",
         "........",
@@ -1381,17 +1789,23 @@ var patterns = [
         "O..O..OO",
         "....O.OO",
         "..OO...."
-    ]),
-    // Trans-block and long hook eating tub (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "trans-block and long hook eating tub",
+    kind: "oscillator",
+    cells: [
         ".....O....",
         ".O.OO.O...",
         "O.O...O...",
         ".O....O.OO",
         ".....OO.OO"
-    ]),
-    // Skewed quad (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "skewed quad",
+    kind: "oscillator",
+    cells: [
         ".OO....",
         ".O...OO",
         "..O.O.O",
@@ -1399,33 +1813,45 @@ var patterns = [
         "O.O.O..",
         "OO...O.",
         "....OO."
-    ]),
-    // Quad (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "quad",
+    kind: "oscillator",
+    cells: [
         "OO..OO",
         "O..O.O",
         ".O....",
         "....O.",
         "O.O..O",
         "OO..OO"
-    ]),
-    // Short keys (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "short keys",
+    kind: "oscillator",
+    cells: [
         ".O........O.",
         "O.OOO..OOO.O",
         ".O..O..O..O.",
         "....O..O...."
-    ]),
-    // Odd keys (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "odd keys",
+    kind: "oscillator",
+    cells: [
         "..........O.",
         ".O.......O.O",
         "O.OOO..OO.O.",
         ".O..O..O....",
         "....O..O...."
-    ]),
-    // Octagon 2 (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "octagon 2",
+    kind: "oscillator",
+    cells: [
         "...OO...",
         "..O..O..",
         ".O....O.",
@@ -1434,9 +1860,12 @@ var patterns = [
         ".O....O.",
         "..O..O..",
         "...OO..."
-    ]),
-    // Griddle and boat (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "griddle and boat",
+    kind: "oscillator",
+    cells: [
         "...O..",
         ".O.O..",
         "O....O",
@@ -1445,9 +1874,12 @@ var patterns = [
         "..OO..",
         ".O.O..",
         "..O..."
-    ]),
-    // Four Boats (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "four Boats",
+    kind: "oscillator",
+    cells: [
         "...O....",
         "..O.O...",
         ".O..O...",
@@ -1456,25 +1888,34 @@ var patterns = [
         "...O..O.",
         "...O.O..",
         "....O..."
-    ]),
-    // Candlefrobra (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "candlefrobra",
+    kind: "oscillator",
+    cells: [
         ".....O....",
         ".O.OO.O.OO",
         "O.O...O.OO",
         ".O....O...",
         ".....OO..."
-    ]),
-    // Bent keys (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "bent keys",
+    kind: "oscillator",
+    cells: [
         ".O........O.",
         "O.O......O.O",
         ".O.OO..OO.O.",
         "....O..O....",
         "....O..O...."
-    ]),
-    // 21P2 (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "21P2",
+    kind: "oscillator",
+    cells: [
         "...O...",
         ".OOO...",
         "O.....O",
@@ -1482,9 +1923,12 @@ var patterns = [
         ".O.....",
         "....O..",
         "...OO.."
-    ]),
-    // Nivasch's pseudo-barberpole (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "nivasch's pseudo-barberpole",
+    kind: "oscillator",
+    cells: [
         "..........OO.",
         "OO.........O.",
         "O........O...",
@@ -1498,9 +1942,12 @@ var patterns = [
         "...O........O",
         ".O.........OO",
         ".OO.........."
-    ]),
-    // Pseudo-barberpole (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "pseudo-barberpole",
+    kind: "oscillator",
+    cells: [
         "..........OO",
         "...........O",
         ".........O..",
@@ -1513,27 +1960,36 @@ var patterns = [
         "..OO........",
         "O...........",
         "OO.........."
-    ]),
-    // Tub test tube baby (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "tub test tube baby",
+    kind: "oscillator",
+    cells: [
         ".O......O.",
         "O.O....O.O",
         ".O.O..O.O.",
         "...O..O...",
         "...O..O...",
         "....OO...."
-    ]),
-    // Odd test tube baby (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "odd test tube baby",
+    kind: "oscillator",
+    cells: [
         ".......O.",
         "OO....O.O",
         "O.O..O.O.",
         "..O..O...",
         "..O..O...",
         "...OO...."
-    ]),
-    // Muttering moat 1 (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "muttering moat 1",
+    kind: "oscillator",
+    cells: [
         "OO.....",
         "O...OO.",
         ".O.O.O.",
@@ -1541,9 +1997,12 @@ var patterns = [
         ".OO..O.",
         "...O..O",
         ".....OO"
-    ]),
-    // Griddle and block (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "griddle and block",
+    kind: "oscillator",
+    cells: [
         "...O..",
         ".O.O..",
         "O....O",
@@ -1551,18 +2010,24 @@ var patterns = [
         "......",
         "..OO..",
         "..OO.."
-    ]),
-    // Blinkers bit pole (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "blinkers bit pole",
+    kind: "oscillator",
+    cells: [
         ".....OO",
         "OOO.O.O",
         ".......",
         ".O.O..O",
         "O....O.",
         "OO...O."
-    ]),
-    // Two eaters (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "two eaters",
+    kind: "oscillator",
+    cells: [
         "OO.......",
         ".O.......",
         ".O.O.....",
@@ -1571,17 +2036,23 @@ var patterns = [
         ".....O.O.",
         ".......O.",
         ".......OO"
-    ]),
-    // Test tube baby (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "test tube baby",
+    kind: "oscillator",
+    cells: [
         "OO....OO",
         "O.O..O.O",
         "..O..O..",
         "..O..O..",
         "...OO..."
-    ]),
-    // Eater plug (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "eater plug",
+    kind: "oscillator",
+    cells: [
         ".......O",
         ".....OOO",
         "....O...",
@@ -1590,9 +2061,12 @@ var patterns = [
         ".O.OO...",
         ".O......",
         "OO......"
-    ]),
-    // Beacon and two tails (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "beacon and two tails",
+    kind: "oscillator",
+    cells: [
         "OO.....",
         "O......",
         "...O.OO",
@@ -1600,9 +2074,12 @@ var patterns = [
         ".....O.",
         "..OOO..",
         "..O...."
-    ]),
-    // Trice tongs (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "trice tongs",
+    kind: "oscillator",
+    cells: [
         "..O....",
         "..OOO..",
         "OO...O.",
@@ -1610,9 +2087,12 @@ var patterns = [
         ".O.....",
         "..OO..O",
         ".....OO"
-    ]),
-    // Jam (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "jam",
+    kind: "oscillator",
+    cells: [
         "...OO.",
         "..O..O",
         "O..O.O",
@@ -1620,9 +2100,12 @@ var patterns = [
         "O.....",
         "...O..",
         ".OO..."
-    ]),
-    // Heptapole (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "heptapole",
+    kind: "oscillator",
+    cells: [
         "OO........",
         "O.O.......",
         "..........",
@@ -1633,9 +2116,12 @@ var patterns = [
         "......O.O.",
         ".........O",
         "........OO"
-    ]),
-    // Why not (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "why not",
+    kind: "oscillator",
+    cells: [
         "...O...",
         "...O.O.",
         ".O.....",
@@ -1643,9 +2129,12 @@ var patterns = [
         ".O.....",
         "...O.O.",
         "...O..."
-    ]),
-    // By flops aka butterfly (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "by flops aka butterfly",
+    kind: "oscillator",
+    cells: [
         "...O..",
         ".O.O..",
         ".....O",
@@ -1653,9 +2142,12 @@ var patterns = [
         ".....O",
         ".O.O..",
         "...O.."
-    ]),
-    // Phoenix 1 aka flip-flops (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "phoenix 1 aka flip-flops",
+    kind: "oscillator",
+    cells: [
         "...O....",
         "...O.O..",
         ".O......",
@@ -1664,24 +2156,33 @@ var patterns = [
         "......O.",
         "..O.O...",
         "....O..."
-    ]),
-    // Pentadecathlon (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "pentadecathlon",
+    kind: "oscillator",
+    cells: [
         "..O....O..",
         "OO.OOOO.OO",
         "..O....O.."
-    ]),
-    // Mold (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "mold",
+    kind: "oscillator",
+    cells: [
         "...OO.",
         "..O..O",
         "O..O.O",
         "....O.",
         "O.OO..",
         ".O...."
-    ]),
-    // Mazing (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "mazing",
+    kind: "oscillator",
+    cells: [
         "...OO..",
         ".O.O...",
         "O.....O",
@@ -1689,9 +2190,12 @@ var patterns = [
         ".......",
         "...O.O.",
         "....O.."
-    ]),
-    // Hexapole (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "hexapole",
+    kind: "oscillator",
+    cells: [
         "OO.......",
         "O.O......",
         ".........",
@@ -1701,9 +2205,12 @@ var patterns = [
         ".........",
         "......O.O",
         ".......OO"
-    ]),
-    // Fox (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "fox",
+    kind: "oscillator",
+    cells: [
         "....O..",
         "....O..",
         "..O..O.",
@@ -1711,27 +2218,36 @@ var patterns = [
         "....O.O",
         "..O.O.O",
         "......O"
-    ]),
-    // Figure eight (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "figure eight",
+    kind: "oscillator",
+    cells: [
         "OOO...",
         "OOO...",
         "OOO...",
         "...OOO",
         "...OOO",
         "...OOO"
-    ]),
-    // Caterer (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "caterer",
+    kind: "oscillator",
+    cells: [
         "..O.....",
         "O...OOOO",
         "O...O...",
         "O.......",
         "...O....",
         ".OO....."
-    ]),
-    // Pentapole (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "pentapole",
+    kind: "oscillator",
+    cells: [
         "OO......",
         "O.O.....",
         "........",
@@ -1740,9 +2256,12 @@ var patterns = [
         "....O.O.",
         ".......O",
         "......OO"
-    ]),
-    // Quadpole (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "quadpole",
+    kind: "oscillator",
+    cells: [
         "OO.....",
         "O.O....",
         ".......",
@@ -1750,70 +2269,97 @@ var patterns = [
         ".......",
         "....O.O",
         ".....OO"
-    ]),
-    // Tripole (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "tripole",
+    kind: "oscillator",
+    cells: [
         "OO....",
         "O.O...",
         "......",
         "..O.O.",
         ".....O",
         "....OO"
-    ]),
-    // Bipole (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "bipole",
+    kind: "oscillator",
+    cells: [
         "OO...",
         "O.O..",
         ".....",
         "..O.O",
         "...OO"
-    ]),
-    // Toad (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "toad",
+    kind: "oscillator",
+    cells: [
         ".OOO",
         "OOO."
-    ]),
-    // Clock (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "clock",
+    kind: "oscillator",
+    cells: [
         "..O.",
         "O.O.",
         ".O.O",
         ".O.."
-    ]),
-    // Beacon (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "beacon",
+    kind: "oscillator",
+    cells: [
         "OO..",
         "O...",
         "...O",
         "..OO"
-    ]),
-    // Heavyweight spaceship aka HWSS (spaceship)
-    new LifePattern([
+    ]
+},
+{
+    name: "HWSS",
+    kind: "spaceship",
+    cells: [
         "...OO..",
         ".O....O",
         "O......",
         "O.....O",
         "OOOOOO."
-    ]),
-    // Middleweight spaceship aka MWSS (spaceship)
-    // Turns to a half-pulsar at the wall
-    new LifePattern([
+    ]
+},
+{
+    name: "MWSS",
+    kind: "spaceship",
+    cells: [
         "...O..",
         ".O...O",
         "O.....",
         "O....O",
         "OOOOO."
-    ]),
-    // Lightweight spaceship aka LWSS aka small fish (spaceship)
-    // Turns to a glider at the wall
-    new LifePattern([
+    ]
+    // Turns to a half-pulsar at the wall
+},
+{
+    name: "LWSS",
+    kind: "spaceship",
+    cells: [
         ".O..O",
         "O....",
         "O...O",
         "OOOO."
-    ]),
-    // Loafer (spaceship)
-    new LifePattern([
+    ]
+    // Turns to a glider at the wall
+},
+{
+    name: "loafer",
+    kind: "spaceship",
+    cells: [
         ".OO..O.OO",
         "O..O..OO.",
         ".O.O.....",
@@ -1823,28 +2369,46 @@ var patterns = [
         ".....O...",
         "......O..",
         ".......OO"
-    ]),
-    // Beehive (still, eventually)
-    new LifePattern([
+    ]
+},
+{
+    name: "L-tetromino",
+    kind: "still", // eventually turns into a beehive
+    cells: [
         "OOO",
         "O.."
-    ]),
-    // Blinker (oscillator)
-    new LifePattern([
+    ]
+},
+{
+    name: "blinker",
+    kind: "oscillator",
+    cells: [
         "OOO"
-    ]),
-    // Glider (spaceship)
-    new LifePattern([
+    ]
+},
+{
+    name: "glider",
+    kind: "spaceship",
+    cells: [
         "OOO",
         "..O",
         ".O."
-    ]),
-    // R-pentomino, by zorg's request
-    new LifePattern([
+    ]
+},
+{
+    name: "R-pentomino",
+    kind: "methuselah",
+    cells: [
         ".OO",
         "OO.",
         ".O."
-    ]),
+    ]
+    // Added by zorg's request
+},
 ];
+
 // TODO: look into shapes on the wall / in the corner
 // TODO: find some oscillators that can be cut in half
+// TODO: ? find more shapes that can be cut in half, maybe with a bigger killbox
+// TODO: don't spawn the very first block near the walls ?
+// TODO: don't spawn the very first block near the walls ?
