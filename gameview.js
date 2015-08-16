@@ -101,10 +101,6 @@ var grid = {
                 else if(colonyVisible && colony.absoluteCellAt(x, y)) {
                     this.showFrame(sprite, this.COLONY_FRAME);
                 }
-                // The cherry
-                else if(cherry.exists && cherry.x == x && cherry.y == y) {
-                    this.showFrame(sprite, this.CHERRY_FRAME);
-                }
                 // Empty cells where life just died
                 else if(wasAlive) {
                     this.showAnimation(sprite, 'die');
@@ -199,13 +195,9 @@ var hud = {
     scoreText: null,
     lengthText: null,
     levelText: null,
-    cherryText: null,
 
     // Difficulty progress bar
     bar: null,
-
-    // Cherry icon near the cherry price
-    cherry: null,
 
     // Bar background sprite, i.e. the "icons"
     background: null,
@@ -218,17 +210,9 @@ var hud = {
         // Progress bar for the difficulty level
         this.bar = game.add.sprite(this.BAR_X, this.ICONS_Y, 'hud-bar');
 
-        // Cherry icon for the cherry price
-        this.cherry = game.add.sprite(this.CHERRY_X, this.ICONS_Y, 'cell', this.CHERRY_FRAME);
-
         // Snake length
         this.lengthText = game.add.text(40 + this.X_GAP, this.TEXT_Y, '0', this.style);
         this.lengthText.anchor.set(0.0, 0.5);
-
-        // Cherry multiplier
-        this.cherryText = game.add.text(this.CHERRY_X + 13 + this.X_GAP, this.TEXT_Y,
-            '0', this.style);
-        this.cherryText.anchor.set(0.0, 0.5);
 
         // Score
         this.scoreText = game.add.text(game.width - 40 - this.X_GAP, this.TEXT_Y,
@@ -252,7 +236,6 @@ var hud = {
 
         // Update all text objects
         this.lengthText.text = snake.desiredLength;
-        this.cherryText.text = "X" + cherry.price; // TODO: don't allocate string each time?
         this.scoreText.text = score;
         this.levelText.text = difficulty.level + 1;
 
@@ -263,14 +246,10 @@ var hud = {
     // Hide or show the entire HUD
     setVisible: function(value) {
         this.background.visible = value;
+        this.bar.visible = value;
         this.lengthText.visible = value;
         this.scoreText.visible = value;
         this.levelText.visible = value;
-        this.bar.visible = value;
-
-        var showCherry = value && cherry.exists && (cherry.price != 1);
-        this.cherry.visible = showCherry;
-        this.cherryText.visible = showCherry;
     }
 
 };

@@ -199,7 +199,7 @@ var colony = {
 
 var snake = {
     // Minimal allowed length of the snake
-    MIN_LENGTH: 3,
+    MIN_LENGTH: 20,
 
     // Maximal allowed length
     MAX_LENGTH: SIZE_X * SIZE_Y,
@@ -207,7 +207,7 @@ var snake = {
     // Length of the snake (desired) when the game starts. The nake will be
     // born with length 1 and immediately start growing until the length
     // reaches this value.
-    START_LENGTH: 15,
+    START_LENGTH: 20,
 
     // Special value saying that the snake doesn't occupy the given cell
     FREE: -1,
@@ -397,12 +397,6 @@ var snake = {
             this.setTailIndexAt(segment.x, segment.y, this.FREE);
         }
         this.tailIn = biteIndex;
-
-        // Reduce length by 1 unit, so that player has to eat cherry now and then
-        this.desiredLength--;
-        if(this.desiredLength < this.MIN_LENGTH) {
-            this.desiredLength = this.MIN_LENGTH;
-        }
     },
 
     // Classify all field cells w.r.t. a loop made by the snake
@@ -458,17 +452,20 @@ var snake = {
         } else {
             return (a <= b) || (b < c);
         }
+    },
+
+    // Helper: increment the desired length while respecting the limits
+    // delta: length change. Can be negative.
+    grow: function(delta) {
+        this.desiredLength += delta;
+        if(this.desiredLength < this.MIN_LENGTH) {
+            this.desiredLength = this.MIN_LENGTH;
+        } else if(this.desiredLength > this.MAX_LENGTH) {
+            this.desiredLength = this.MAX_LENGTH;
+        }
     }
 
 }.initialize(); // var snake = {...}
-
-// The cherry that can be eaten for growth
-var cherry = {
-    exists: false,
-    x: 0,
-    y: 0,
-    price: 1
-};
 
 var gameLogic = {
     // Reset the game state (i.e. start a new game)
@@ -487,10 +484,6 @@ var gameLogic = {
 
         // Put the snake in start position
         snake.reset();
-
-        // Pick a random place for the cherry
-        cherry.price = 1;
-        this.maybeSpawnCherry();
     },
 
     // Make one step in the game
@@ -506,39 +499,19 @@ var gameLogic = {
             colony.spawnTick = currentTick + colony.spawnDelay;
         }
 
-        // Destroy the cherry if life crept on it
-        if(cherry.exists && life.cellAt(cherry.x, cherry.y)) {
-            cherry.exists = false;
-        }
-
         // Make a snake's step, turning if there was user input
         snake.tick(userInput);
 
-        // Snake grows when it eats the cherry
-        if(cherry.exists && cherry.x == snake.head.x && cherry.y == snake.head.y) {
-            snake.desiredLength += cherry.price;
-            if(snake.desiredLength > snake.MAX_LENGTH) {
-                snake.desiredLength = snake.MAX_LENGTH;
-            }
-
-            cherry.exists = false;
-            if(cherry.price < 4) {
-                cherry.price++;
-            }
-        }
-
         // If the snake surrounded something, destroy all Life there
         if(snake.hadLoop) {
+            var ateCells = 0;
             for(var x = 0; x < SIZE_X; x++) {
                 for(var y = 0; y < SIZE_Y; y++) {
                     var situation = snake.loopClassAt(x, y);
 
-                    // Get points for all the life strictly inside the loop
+                    // Consider as "eaten" all cells strictly inside the loop
                     if(situation == snake.INSIDE && life.cellAt(x, y)) {
-                        // Score multiplier is the snake's length. We add 1 to
-                        // compensate for 1 unit of length that was lost when
-                        // the snake bit itself.
-                        score += snake.desiredLength + 1;
+                        ateCells++;
                     }
 
                     // Destroy life inside and on the loop
@@ -548,13 +521,12 @@ var gameLogic = {
                 }
             }
 
-            // Drop the cherry multiplier as penalty for biting self
-            cherry.price = 1;
-        }
+            // Get points for the eaten Life. We're using a convex function to encourage
+            // eating many Life groups in one surround.
+            score += ateCells * ateCells;
 
-        // Respawn the cherry if it was eaten/destroyed
-        if(!cherry.exists && snake.desiredLength < snake.MAX_LENGTH) {
-            this.maybeSpawnCherry();
+            // Grow longer if we ate something, grow shorter otherwise as penalty
+            snake.grow(ateCells ? 1 : -1);
         }
     },
 
@@ -563,15 +535,6 @@ var gameLogic = {
         return !inBounds(snake.head.x, snake.head.y)
             || life.cellAt(snake.head.x, snake.head.y);
     },
-
-    // Try to spawn the cherry. Cherry may not be spawned when
-    // the field is too crowded.
-    maybeSpawnCherry: function() {
-        cherry.x = game.rnd.between(0, SIZE_X - 1);
-        cherry.y = game.rnd.between(0, SIZE_Y - 1);
-        cherry.exists = !life.cellAt(cherry.x, cherry.y) &&
-            (snake.indexAt(cherry.x, cherry.y) == snake.FREE);
-    }
 
 }; // var gameLogic = {...}
 
