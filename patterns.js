@@ -26,6 +26,12 @@ LifePattern.prototype.cellAt = function(x, y) {
     return this.cells[x * this.sizeY + y];
 }
 
+// Which length the snake must have to kill this pattern.
+// Applies only to still lifes and oscillators.
+LifePattern.prototype.killLength = function() {
+    return 2 * (this.box.x + this.box.y) + 5;
+}
+
 var patterns = [
 new LifePattern({
     name: "block",

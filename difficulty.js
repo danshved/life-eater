@@ -22,8 +22,13 @@ var difficulty = {
 
     // Called each time a new game starts
     reset: function() {
+        // Go back to the first level
         this.level = 0;
         this.apply();
+
+        // Tell the ``colony'' object to use level-dependent pattern chooser
+        colony.pickPattern = patternChooser.pickPattern;
+        colony.pickPatternContext = patternChooser;
     },
 
     tick: function() {
@@ -54,6 +59,41 @@ var difficulty = {
         var nextScore = this.LEVELUPS[this.level];
         var prevScore = (this.level == 0) ? 0 : this.LEVELUPS[this.level - 1];
         return (score - prevScore) / (nextScore - prevScore);
+    }
+
+}.initialize();
+
+// The object that determines which patterns spawn on which level
+var patternChooser = {
+    // All still lifes
+    stillPatterns: [],
+
+    // One-time initialization
+    initialize: function() {
+        // Build the list of all "still life" patterns
+        for(var i = 0; i < patterns.length; i++) {
+            var pattern = patterns[i];
+            if(pattern.kind === 'still') {
+                this.stillPatterns.push(pattern);
+            }
+        }
+
+        // Sort by perimeter
+        this.stillPatterns.sort(
+            function(a, b) { return a.killLength() - b.killLength(); }
+        );
+
+        // TODO: remove
+        for(var i = 0; i < this.stillPatterns.length; i++) {
+            console.log(this.stillPatterns[i].killLength());
+        }
+
+        return this;
+    },
+
+    // Pick a random pattern appropriate for the current difficulty level
+    pickPattern: function() {
+        return this.stillPatterns[game.rnd.between(0, this.stillPatterns.length - 1)];
     }
 
 }.initialize();

@@ -125,6 +125,12 @@ var colony = {
     // Colony cells as a boolean array
     cells: [],
 
+    // Method to choose a random pattern. This will be replaced by the difficulty manager.
+    pickPatternContext: null,
+    pickPattern: function() {
+        return patterns[game.rnd.between(0, patterns.length - 1)];
+    },
+
     // Colony cells
     // dx, dy: RELATIVE coordinates inside the colony
     cellAt: function(dx, dy) {
@@ -149,7 +155,7 @@ var colony = {
     generate: function(pattern) {
         // Choose a pattern at random if one wasn't given
         if(!pattern) {
-            pattern = patterns[game.rnd.between(0, patterns.length - 1)];
+            pattern = this.pickPattern.call(this.pickPatternContext);
         }
 
         // Copy the pattern to our memory, and apply a random
