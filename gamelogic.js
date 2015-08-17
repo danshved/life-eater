@@ -106,7 +106,7 @@ var colony = {
 
     // How many ticks pass between colony spawns
     // This will be altered by the difficulty manager
-    spawnDelay: 85,
+    spawnDelay: 55,
 
     // When the colony will be spawned
     spawnTick: 0,
@@ -486,7 +486,7 @@ var patternChooser = {
         // Build the list of all "still life" patterns
         for(var i = 0; i < patterns.length; i++) {
             var pattern = patterns[i];
-            if(pattern.kind === 'still') {
+            if(pattern.kind === 'still' || pattern.kind === 'oscillator') {
                 this.stillPatterns.push(pattern);
             }
         }

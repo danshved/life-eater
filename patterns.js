@@ -17,9 +17,8 @@ function LifePattern(rawPattern) {
     }
 
     // Determine the bounding box
-    if(this.kind == 'still') {
-        this.box = { x: this.sizeX, y: this.sizeY };
-    }
+    this.box = rawPattern.box ? rawPattern.box :
+        { x: this.sizeX, y: this.sizeY };
 }
 
 LifePattern.prototype.cellAt = function(x, y) {
@@ -1104,6 +1103,7 @@ new LifePattern({
 new LifePattern({
     name: "prepond",
     kind: "still", // eventually turns into a pond
+    box: { x: 4, y: 4},
     cells: [
         ".O.",
         "OO.",
@@ -1141,6 +1141,7 @@ new LifePattern({
 new LifePattern({
     name: "tumbler",
     kind: "oscillator",
+    box: { x: 9, y: 7 },
     cells: [
         ".O.....O.",
         "O.O...O.O",
@@ -1536,6 +1537,7 @@ new LifePattern({
 new LifePattern({
     name: "queen bee shuttle",
     kind: "oscillator",
+    box: { x: 22, y: 7 },
     cells: [
         ".........O............",
         ".......O.O............",
@@ -1549,6 +1551,7 @@ new LifePattern({
 new LifePattern({
     name: "pentoad",
     kind: "oscillator",
+    box: { x: 13, y: 12 },
     cells: [
         "...........OO",
         "...........O.",
@@ -1567,6 +1570,7 @@ new LifePattern({
 new LifePattern({
     name: "elkies' p5",
     kind: "oscillator",
+    box: { x: 9, y: 8 },
     cells: [
         ".O.......",
         "O..OOO...",
@@ -1579,8 +1583,9 @@ new LifePattern({
     ]
 }),
 new LifePattern({
-    name: "eater/block frop",
+    name: "eater/block frob",
     kind: "oscillator",
+    box: { x: 10, y: 10 },
     cells: [
         ".OO.......",
         "..O.......",
@@ -1597,6 +1602,7 @@ new LifePattern({
 new LifePattern({
     name: "confused eaters",
     kind: "oscillator",
+    box: { x: 11, y: 11 },
     cells: [
         "O..........",
         "OOO........",
@@ -1614,6 +1620,7 @@ new LifePattern({
 new LifePattern({
     name: "two pulsar quadrants",
     kind: "oscillator",
+    box: { x: 10, y: 10 },
     cells: [
         "....O....",
         "....O....",
@@ -1629,6 +1636,7 @@ new LifePattern({
 new LifePattern({
     name: "spark coil",
     kind: "oscillator",
+    box: { x: 8, y: 5 },
     cells: [
         "OO....OO",
         "O.O..O.O",
@@ -1640,6 +1648,7 @@ new LifePattern({
 new LifePattern({
     name: "pulsar quadrant",
     kind: "oscillator",
+    box: { x: 9, y: 9 },
     cells: [
         ".....O..",
         "...OOO..",
@@ -1654,6 +1663,7 @@ new LifePattern({
 new LifePattern({
     name: "monogram",
     kind: "oscillator",
+    box: { x: 7, y: 7 },
     cells: [
         "OO...OO",
         ".O.O.O.",
@@ -1665,6 +1675,7 @@ new LifePattern({
 new LifePattern({
     name: "french kiss",
     kind: "oscillator",
+    box: { x: 10, y: 9 },
     cells: [
         "O.........",
         "OOO.......",
@@ -1680,6 +1691,7 @@ new LifePattern({
 new LifePattern({
     name: "cuphook",
     kind: "oscillator",
+    box: { x: 9, y: 8 },
     cells: [
         "....OO...",
         "OO.O.O...",
@@ -1694,6 +1706,7 @@ new LifePattern({
 new LifePattern({
     name: "cis-boat and long hook eating tub",
     kind: "oscillator",
+    box: { x: 11, y: 5 },
     cells: [
         ".....O.....",
         ".O.OO.O.OO.",
@@ -1705,6 +1718,7 @@ new LifePattern({
 new LifePattern({
     name: "beehive and long hook eating tub",
     kind: "oscillator",
+    box: { x: 11, y: 5 },
     cells: [
         ".....O...O.",
         ".O.OO.O.O.O",
@@ -1716,6 +1730,7 @@ new LifePattern({
 new LifePattern({
     name: "achim's p8",
     kind: "oscillator",
+    box: { x: 9, y: 9 },
     cells: [
         ".OO......",
         "O........",
@@ -1731,6 +1746,7 @@ new LifePattern({
 new LifePattern({
     name: "smiley",
     kind: "oscillator",
+    box: { x: 7, y: 8 },
     cells: [
         "OOO.OOO",
         ".O.O.O.",
@@ -1744,6 +1760,7 @@ new LifePattern({
 new LifePattern({
     name: "fumarole",
     kind: "oscillator",
+    box: { x: 8, y: 7 },
     cells: [
         "...OO...",
         ".O....O.",
@@ -1757,6 +1774,7 @@ new LifePattern({
 new LifePattern({
     name: "silver's p5",
     kind: "oscillator",
+    box: { x: 11, y: 7 },
     cells: [
         "OO.........",
         "O..........",
@@ -1770,6 +1788,7 @@ new LifePattern({
 new LifePattern({
     name: "griddle and beehive",
     kind: "oscillator",
+    box: { x: 6, y: 8 },
     cells: [
         "...O..",
         ".O.O..",
@@ -1784,6 +1803,7 @@ new LifePattern({
 new LifePattern({
     name: "coe's p8",
     kind: "oscillator",
+    box: { x: 12, y: 8 },
     cells: [
         "OO..........",
         "OO..OO......",
@@ -1796,6 +1816,7 @@ new LifePattern({
 new LifePattern({
     name: "almosymmetric",
     kind: "oscillator",
+    box: { x: 9, y: 8 },
     cells: [
         "....O....",
         "OO..O.O..",
@@ -1810,6 +1831,7 @@ new LifePattern({
 new LifePattern({
     name: "unix",
     kind: "oscillator",
+    box: { x: 9, y: 9 },
     cells: [
         ".OO.....",
         ".OO.....",
@@ -1824,6 +1846,7 @@ new LifePattern({
 new LifePattern({
     name: "trans-block and long hook eating tub",
     kind: "oscillator",
+    box: { x: 10, y: 5 },
     cells: [
         ".....O....",
         ".O.OO.O...",
@@ -1835,6 +1858,7 @@ new LifePattern({
 new LifePattern({
     name: "skewed quad",
     kind: "oscillator",
+    box: { x: 7, y: 7 },
     cells: [
         ".OO....",
         ".O...OO",
@@ -1848,6 +1872,7 @@ new LifePattern({
 new LifePattern({
     name: "quad",
     kind: "oscillator",
+    box: { x: 6, y: 6 },
     cells: [
         "OO..OO",
         "O..O.O",
@@ -1860,6 +1885,7 @@ new LifePattern({
 new LifePattern({
     name: "short keys",
     kind: "oscillator",
+    box: { x: 12, y: 5 },
     cells: [
         ".O........O.",
         "O.OOO..OOO.O",
@@ -1870,6 +1896,7 @@ new LifePattern({
 new LifePattern({
     name: "odd keys",
     kind: "oscillator",
+    box: { x: 12, y: 5 },
     cells: [
         "..........O.",
         ".O.......O.O",
@@ -1881,6 +1908,7 @@ new LifePattern({
 new LifePattern({
     name: "octagon 2",
     kind: "oscillator",
+    box: { x: 8, y: 8 },
     cells: [
         "...OO...",
         "..O..O..",
@@ -1895,6 +1923,7 @@ new LifePattern({
 new LifePattern({
     name: "griddle and boat",
     kind: "oscillator",
+    box: { x: 6, y: 8 },
     cells: [
         "...O..",
         ".O.O..",
@@ -1907,8 +1936,9 @@ new LifePattern({
     ]
 }),
 new LifePattern({
-    name: "four Boats",
+    name: "four boats",
     kind: "oscillator",
+    box: { x: 8, y: 8 },
     cells: [
         "...O....",
         "..O.O...",
@@ -1923,6 +1953,7 @@ new LifePattern({
 new LifePattern({
     name: "candlefrobra",
     kind: "oscillator",
+    box: { x: 10, y: 5 },
     cells: [
         ".....O....",
         ".O.OO.O.OO",
@@ -1934,6 +1965,7 @@ new LifePattern({
 new LifePattern({
     name: "bent keys",
     kind: "oscillator",
+    box: { x: 12, y: 5 },
     cells: [
         ".O........O.",
         "O.O......O.O",
@@ -1945,6 +1977,7 @@ new LifePattern({
 new LifePattern({
     name: "21P2",
     kind: "oscillator",
+    box: { x: 7, y: 7 },
     cells: [
         "...O...",
         ".OOO...",
@@ -1958,6 +1991,7 @@ new LifePattern({
 new LifePattern({
     name: "nivasch's pseudo-barberpole",
     kind: "oscillator",
+    box: { x: 13, y: 13 },
     cells: [
         "..........OO.",
         "OO.........O.",
@@ -1977,6 +2011,7 @@ new LifePattern({
 new LifePattern({
     name: "pseudo-barberpole",
     kind: "oscillator",
+    box: { x: 12, y: 12 },
     cells: [
         "..........OO",
         "...........O",
@@ -1995,6 +2030,7 @@ new LifePattern({
 new LifePattern({
     name: "tub test tube baby",
     kind: "oscillator",
+    box: { x: 10, y: 6 },
     cells: [
         ".O......O.",
         "O.O....O.O",
@@ -2007,6 +2043,7 @@ new LifePattern({
 new LifePattern({
     name: "odd test tube baby",
     kind: "oscillator",
+    box: { x: 9, y: 6 },
     cells: [
         ".......O.",
         "OO....O.O",
@@ -2019,6 +2056,7 @@ new LifePattern({
 new LifePattern({
     name: "muttering moat 1",
     kind: "oscillator",
+    box: { x: 7, y: 7 },
     cells: [
         "OO.....",
         "O...OO.",
@@ -2032,6 +2070,7 @@ new LifePattern({
 new LifePattern({
     name: "griddle and block",
     kind: "oscillator",
+    box: { x: 6, y: 7 },
     cells: [
         "...O..",
         ".O.O..",
@@ -2045,6 +2084,7 @@ new LifePattern({
 new LifePattern({
     name: "blinkers bit pole",
     kind: "oscillator",
+    box: { x: 7, y: 6 },
     cells: [
         ".....OO",
         "OOO.O.O",
@@ -2057,6 +2097,7 @@ new LifePattern({
 new LifePattern({
     name: "two eaters",
     kind: "oscillator",
+    box: { x: 9, y: 8 },
     cells: [
         "OO.......",
         ".O.......",
@@ -2071,6 +2112,7 @@ new LifePattern({
 new LifePattern({
     name: "test tube baby",
     kind: "oscillator",
+    box: { x: 8, y: 5 },
     cells: [
         "OO....OO",
         "O.O..O.O",
@@ -2082,6 +2124,7 @@ new LifePattern({
 new LifePattern({
     name: "eater plug",
     kind: "oscillator",
+    box: { x: 8, y: 8 },
     cells: [
         ".......O",
         ".....OOO",
@@ -2096,6 +2139,7 @@ new LifePattern({
 new LifePattern({
     name: "beacon and two tails",
     kind: "oscillator",
+    box: { x: 7, y: 7 },
     cells: [
         "OO.....",
         "O......",
@@ -2109,6 +2153,7 @@ new LifePattern({
 new LifePattern({
     name: "trice tongs",
     kind: "oscillator",
+    box: { x: 7, y: 7 },
     cells: [
         "..O....",
         "..OOO..",
@@ -2122,6 +2167,7 @@ new LifePattern({
 new LifePattern({
     name: "jam",
     kind: "oscillator",
+    box: { x: 7, y: 7 },
     cells: [
         "...OO.",
         "..O..O",
@@ -2135,6 +2181,7 @@ new LifePattern({
 new LifePattern({
     name: "heptapole",
     kind: "oscillator",
+    box: { x: 10, y: 10 },
     cells: [
         "OO........",
         "O.O.......",
@@ -2151,6 +2198,7 @@ new LifePattern({
 new LifePattern({
     name: "why not",
     kind: "oscillator",
+    box: { x: 7, y: 7 },
     cells: [
         "...O...",
         "...O.O.",
@@ -2162,8 +2210,9 @@ new LifePattern({
     ]
 }),
 new LifePattern({
-    name: "by flops aka butterfly",
+    name: "by flops",
     kind: "oscillator",
+    box: { x: 6, y: 7 },
     cells: [
         "...O..",
         ".O.O..",
@@ -2175,8 +2224,9 @@ new LifePattern({
     ]
 }),
 new LifePattern({
-    name: "phoenix 1 aka flip-flops",
+    name: "phoenix 1",
     kind: "oscillator",
+    box: { x: 8, y: 8 },
     cells: [
         "...O....",
         "...O.O..",
@@ -2191,6 +2241,7 @@ new LifePattern({
 new LifePattern({
     name: "pentadecathlon",
     kind: "oscillator",
+    box: { x: 16, y: 9 },
     cells: [
         "..O....O..",
         "OO.OOOO.OO",
@@ -2200,6 +2251,7 @@ new LifePattern({
 new LifePattern({
     name: "mold",
     kind: "oscillator",
+    box: { x: 6, y: 6 },
     cells: [
         "...OO.",
         "..O..O",
@@ -2212,6 +2264,7 @@ new LifePattern({
 new LifePattern({
     name: "mazing",
     kind: "oscillator",
+    box: { x: 7, y: 7 },
     cells: [
         "...OO..",
         ".O.O...",
@@ -2225,6 +2278,7 @@ new LifePattern({
 new LifePattern({
     name: "hexapole",
     kind: "oscillator",
+    box: { x: 9, y: 9 },
     cells: [
         "OO.......",
         "O.O......",
@@ -2240,6 +2294,7 @@ new LifePattern({
 new LifePattern({
     name: "fox",
     kind: "oscillator",
+    box: { x: 8, y: 7 },
     cells: [
         "....O..",
         "....O..",
@@ -2253,6 +2308,7 @@ new LifePattern({
 new LifePattern({
     name: "figure eight",
     kind: "oscillator",
+    box: { x: 10, y: 10 },
     cells: [
         "OOO...",
         "OOO...",
@@ -2265,6 +2321,7 @@ new LifePattern({
 new LifePattern({
     name: "caterer",
     kind: "oscillator",
+    box: { x: 9, y: 6 },
     cells: [
         "..O.....",
         "O...OOOO",
@@ -2277,6 +2334,7 @@ new LifePattern({
 new LifePattern({
     name: "pentapole",
     kind: "oscillator",
+    box: { x: 8, y: 8 },
     cells: [
         "OO......",
         "O.O.....",
@@ -2291,6 +2349,7 @@ new LifePattern({
 new LifePattern({
     name: "quadpole",
     kind: "oscillator",
+    box: { x: 7, y: 7 },
     cells: [
         "OO.....",
         "O.O....",
@@ -2304,6 +2363,7 @@ new LifePattern({
 new LifePattern({
     name: "tripole",
     kind: "oscillator",
+    box: { x: 6, y: 6 },
     cells: [
         "OO....",
         "O.O...",
@@ -2316,6 +2376,7 @@ new LifePattern({
 new LifePattern({
     name: "bipole",
     kind: "oscillator",
+    box: { x: 5, y: 5 },
     cells: [
         "OO...",
         "O.O..",
@@ -2327,6 +2388,7 @@ new LifePattern({
 new LifePattern({
     name: "toad",
     kind: "oscillator",
+    box: { x: 4, y: 4 },
     cells: [
         ".OOO",
         "OOO."
@@ -2335,6 +2397,7 @@ new LifePattern({
 new LifePattern({
     name: "clock",
     kind: "oscillator",
+    box: { x: 4, y: 4 },
     cells: [
         "..O.",
         "O.O.",
@@ -2345,6 +2408,7 @@ new LifePattern({
 new LifePattern({
     name: "beacon",
     kind: "oscillator",
+    box: { x: 4, y: 4 },
     cells: [
         "OO..",
         "O...",
@@ -2404,6 +2468,7 @@ new LifePattern({
 new LifePattern({
     name: "L-tetromino",
     kind: "still", // eventually turns into a beehive
+    box: { x: 3, y: 4},
     cells: [
         "OOO",
         "O.."
@@ -2412,6 +2477,7 @@ new LifePattern({
 new LifePattern({
     name: "blinker",
     kind: "oscillator",
+    box: { x: 3, y: 3 },
     cells: [
         "OOO"
     ]
@@ -2442,3 +2508,4 @@ new LifePattern({
 // TODO: ? find more shapes that can be cut in half, maybe with a bigger killbox
 // TODO: don't spawn the very first block near the walls ?
 // TODO: don't spawn the very first block near the walls ?
+// TODO: too many still life in the beginning
