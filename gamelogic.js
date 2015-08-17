@@ -117,7 +117,7 @@ var colony = {
 
     // How many ticks pass between colony spawns
     // This will be altered by the difficulty manager
-    spawnDelay: 55,
+    spawnDelay: 45,
 
     // When the colony will be spawned
     spawnTick: 0,
@@ -513,14 +513,6 @@ var patternChooser = {
             while(this.borders.length <= killLength) {
                 this.borders.push(i);
             }
-        }
-
-        // TODO remove this
-        for(var i = 0; i < this.stillPatterns.length; i++) {
-            console.log(i, this.stillPatterns[i].killLength());
-        }
-        for(var i = 0; i < this.borders.length; i++) {
-            console.log(i, this.borders[i]);
         }
 
         return this;

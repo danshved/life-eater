@@ -17,7 +17,8 @@ function LifePattern(rawPattern) {
     }
 
     // Determine the bounding box
-    this.box = rawPattern.box ? rawPattern.box :
+    this.killBox = rawPattern.killBox ? rawPattern.killBox :
+        rawPattern.box ? rawPattern.box :
         { x: this.sizeX, y: this.sizeY };
 }
 
@@ -28,7 +29,7 @@ LifePattern.prototype.cellAt = function(x, y) {
 // Which length the snake must have to kill this pattern.
 // Applies only to still lifes and oscillators.
 LifePattern.prototype.killLength = function() {
-    return 2 * (this.box.x + this.box.y) + 5;
+    return 2 * (this.killBox.x + this.killBox.y) + 5;
 }
 
 var blockPattern = new LifePattern({
@@ -69,6 +70,7 @@ new LifePattern({
 new LifePattern({
     name: "cis-R-bee and R-loaf",
     kind: "still",
+    killBox: { x: 4, y: 3 },
     cells: [
         ".OO.",
         "O..O",
@@ -107,6 +109,7 @@ new LifePattern({
 new LifePattern({
     name: "ortho-loaf and table",
     kind: "still",
+    killBox: { x: 4, y: 2 },
     cells: [
         "..O..",
         ".O.O.",
@@ -132,6 +135,7 @@ new LifePattern({
 new LifePattern({
     name: "beehive and cap",
     kind: "still",
+    killBox: { x: 4, y: 3 },
     cells: [
         ".OO..",
         "O..O.",
@@ -180,6 +184,7 @@ new LifePattern({
 new LifePattern({
     name: "beehive and table",
     kind: "still",
+    killBox: { x: 4, y: 2 },
     cells: [
         "..OO.",
         ".O..O",
@@ -192,6 +197,7 @@ new LifePattern({
 new LifePattern({
     name: "cis-boat and table",
     kind: "still",
+    killBox: { x: 4, y: 2 },
     cells: [
         ".O..",
         "O.O.",
@@ -204,6 +210,7 @@ new LifePattern({
 new LifePattern({
     name: "r-bee and snake",
     kind: "still",
+    killBox: { x: 4, y: 2 },
     cells: [
         "OO.O.",
         "O.OO.",
@@ -229,6 +236,7 @@ new LifePattern({
 new LifePattern({
     name: "trans-boat and dock",
     kind: "still",
+    killBox: { x: 3, y: 3 },
     cells: [
         ".O....",
         "O.O...",
@@ -267,6 +275,7 @@ new LifePattern({
 new LifePattern({
     name: "trans-rotated R-bee",
     kind: "still",
+    killBox: { x: 3, y: 4 },
     cells: [
         ".O.....",
         "O.O....",
@@ -394,6 +403,7 @@ new LifePattern({
 new LifePattern({
     name: "cis-hook and R-bee",
     kind: "still",
+    killBox: { x: 4, y: 3 },
     cells: [
         "..OO",
         "O..O",
@@ -417,6 +427,7 @@ new LifePattern({
 new LifePattern({
     name: "trans-R-bee and R-loaf",
     kind: "still",
+    killBox: { x: 4, y: 3 },
     cells: [
         "..OO.",
         ".O..O",
@@ -462,6 +473,7 @@ new LifePattern({
 new LifePattern({
     name: "cis-block and long hook",
     kind: "still",
+    killBox: { x: 2, y: 2 },
     cells: [
         "...OO",
         "O...O",
@@ -487,6 +499,7 @@ new LifePattern({
 new LifePattern({
     name: "cis-boat and dock",
     kind: "still",
+    killBox: { x: 4, y: 3 },
     cells: [
         "..O...",
         ".O.O..",
@@ -500,6 +513,7 @@ new LifePattern({
 new LifePattern({
     name: "block and two walls",
     kind: "still",
+    killBox: { x: 2, y: 2 },
     cells: [
         "OO.OO",
         "OO.O.",
@@ -511,6 +525,7 @@ new LifePattern({
 new LifePattern({
     name: "trans-hook and R-bee",
     kind: "still",
+    killBox: { x: 4, y: 3 },
     cells: [
         "...OO",
         ".O..O",
@@ -524,6 +539,7 @@ new LifePattern({
 new LifePattern({
     name: "mirrored dock",
     kind: "still",
+    killBox: { x: 6, y: 3 },
     cells: [
         "OO..OO",
         "O....O",
@@ -548,6 +564,7 @@ new LifePattern({
 new LifePattern({
     name: "trans-block and long hook",
     kind: "still",
+    killBox: { x: 2, y: 2 },
     cells: [
         "...OO",
         "O...O",
@@ -560,11 +577,12 @@ new LifePattern({
 new LifePattern({
     name: "cis-rotated hook",
     kind: "still",
+    killBox: { x: 3, y: 4 },
     cells: [
         ".OO....",
         "..O..OO",
         "O.O.O.O",
-        "Oo..O..",
+        "OO..O..",
         "....OO."
     ]
 }),
@@ -583,6 +601,7 @@ new LifePattern({
 new LifePattern({
     name: "block and cap",
     kind: "still",
+    killBox: { x: 2, y: 2 },
     cells: [
         ".OO.",
         "O..O",
@@ -607,6 +626,7 @@ new LifePattern({
 new LifePattern({
     name: "bookends",
     kind: "still",
+    killBox: { x: 3, y: 4 },
     cells: [
         "OO...OO",
         "O.O.O.O",
@@ -617,6 +637,7 @@ new LifePattern({
 new LifePattern({
     name: "dead spark coil",
     kind: "still",
+    killBox: { x: 3, y: 5 },
     cells: [
         "OO...OO",
         "O.O.O.O",
@@ -628,6 +649,7 @@ new LifePattern({
 new LifePattern({
     name: "trans-mirrored R-bee",
     kind: "still",
+    killBox: { x: 3, y: 4 },
     cells: [
         ".....O.",
         ".OO.O.O",
@@ -694,6 +716,7 @@ new LifePattern({
 new LifePattern({
     name: "beehive and dock",
     kind: "still",
+    killBox: { x: 4, y: 3 },
     cells: [
         "...OO.",
         "..O..O",
@@ -718,6 +741,7 @@ new LifePattern({
 new LifePattern({
     name: "block and dock",
     kind: "still",
+    killBox: { x: 2, y: 2 },
     cells: [
         "...OO.",
         "...OO.",
@@ -730,6 +754,7 @@ new LifePattern({
 new LifePattern({
     name: "block on table",
     kind: "still",
+    killBox: { x: 2, y: 2 },
     cells: [
         "..OO",
         "..OO",
@@ -752,6 +777,7 @@ new LifePattern({
 new LifePattern({
     name: "cis-mirrored R-bee",
     kind: "still",
+    killBox: { x: 3, y: 4 },
     cells: [
         ".OO.OO.",
         "O.O.O.O",
@@ -762,6 +788,7 @@ new LifePattern({
 new LifePattern({
     name: "alternate table on table",
     kind: "still",
+    killBox: { x: 4, y: 2 },
     cells: [
         "O..O..",
         "OOOO..",
@@ -773,6 +800,7 @@ new LifePattern({
 new LifePattern({
     name: "table on table",
     kind: "still",
+    killBox: { x: 4, y: 2 },
     cells: [
         "O..O",
         "OOOO",
@@ -887,6 +915,7 @@ new LifePattern({
 new LifePattern({
     name: "carrier siamese snake",
     kind: "still",
+    killBox: { x: 2, y: 2 },
     cells: [
         "OO.OO..",
         "O.OO..O",
@@ -1019,6 +1048,7 @@ new LifePattern({
 new LifePattern({
     name: "aircraft carrier aka carrier",
     kind: "still",
+    killBox: { x: 2, y: 2 },
     cells: [
         "OO..",
         "O..O",
@@ -1692,6 +1722,7 @@ new LifePattern({
     name: "cuphook",
     kind: "oscillator",
     box: { x: 9, y: 8 },
+    killBox: { x: 2, y: 2 },
     cells: [
         "....OO...",
         "OO.O.O...",
@@ -1789,6 +1820,7 @@ new LifePattern({
     name: "griddle and beehive",
     kind: "oscillator",
     box: { x: 6, y: 8 },
+    killBox: { x: 4, y: 3 },
     cells: [
         "...O..",
         ".O.O..",
@@ -1924,6 +1956,7 @@ new LifePattern({
     name: "griddle and boat",
     kind: "oscillator",
     box: { x: 6, y: 8 },
+    killBox: { x: 3, y: 3 },
     cells: [
         "...O..",
         ".O.O..",
@@ -2071,6 +2104,7 @@ new LifePattern({
     name: "griddle and block",
     kind: "oscillator",
     box: { x: 6, y: 7 },
+    killBox: { x: 2, y: 2 },
     cells: [
         "...O..",
         ".O.O..",
@@ -2140,6 +2174,7 @@ new LifePattern({
     name: "beacon and two tails",
     kind: "oscillator",
     box: { x: 7, y: 7 },
+    killBox: { x: 4, y: 4 },
     cells: [
         "OO.....",
         "O......",
