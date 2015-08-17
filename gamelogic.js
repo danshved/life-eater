@@ -14,6 +14,9 @@ var currentTick = 0;
 
 // Game of Life field
 var life = {
+    // Whether the field is empty (all cells are dead)
+    isEmpty: true,
+
     // SIZE_X * SIZE_Y booleans. true/false = alive/dead cell.
     cells: [],
 
@@ -47,6 +50,7 @@ var life = {
             this.cells[i] = false;
             this.oldCells[i] = false;
         }
+        this.isEmpty = true;
     },
 
     // Make a step according to the rules of the automaton.
@@ -58,7 +62,7 @@ var life = {
         this.oldCells = tmp;
 
         // Apply the rules of Life
-        // Omit cells near the border: this 1-unit thin rectangle is Life-free.
+        this.isEmpty = true;
         for(var x = 0; x < SIZE_X; x++) {
             for(var y = 0; y < SIZE_Y; y++) {
                 // Count the neighbors
@@ -75,7 +79,10 @@ var life = {
                 // Set cell dead/alive by the rule
                 // A live cell stays alive iff it has 2 or 3 live neighbors
                 // A dead cell comes to life iff it has 3 live neighbors
-                this.setCellAt(x, y, (cnt == 3) || (cnt == 4 && this.oldCellAt(x, y)));
+                var alive = (cnt == 3) || (cnt == 4 && this.oldCellAt(x, y));
+
+                this.setCellAt(x, y, alive);
+                this.isEmpty &= !alive;
             }
         }
     },
@@ -103,6 +110,10 @@ var life = {
 var colony = {
     // How many ticks between game start and first colony spawn
     FIRST_DELAY: 20,
+
+    // Maximum delay until the colony is spawned after the game field becomes
+    // completely empty
+    URGENT_DELAY: 12,
 
     // How many ticks pass between colony spawns
     // This will be altered by the difficulty manager
@@ -551,6 +562,14 @@ var gameLogic = {
     tick: function(userInput) {
         // Make a step in the Game of Life
         life.tick();
+
+        // Hurry up Life spawn if the game field is empty
+        var urgentTick = currentTick + colony.URGENT_DELAY;
+        if(life.isEmpty && currentTick >= colony.FIRST_DELAY &&
+            colony.spawnTick > urgentTick)
+        {
+            colony.spawnTick = urgentTick;
+        }
 
         // Drop a new Life colony if it's time
         if(currentTick >= colony.spawnTick) {
