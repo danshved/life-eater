@@ -32,15 +32,16 @@ LifePattern.prototype.killLength = function() {
     return 2 * (this.box.x + this.box.y) + 5;
 }
 
-var patterns = [
-new LifePattern({
+var blockPattern = new LifePattern({
     name: "block",
     kind: "still",
     cells: [
         "OO",
         "OO"
     ]
-}),
+});
+
+var patterns = [ blockPattern,
 new LifePattern({
     name: "beehive at beehive",
     kind: "still",

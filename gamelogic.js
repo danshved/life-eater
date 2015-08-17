@@ -477,6 +477,10 @@ var patternChooser = {
     // All still lifes
     stillPatterns: [],
 
+    // For each i, borders[i] gives the index of the first item in
+    // ``stillPatterns'' that has killLength >= i
+    borders: [],
+
     // One-time initialization
     initialize: function() {
         // Build the list of all "still life" patterns
@@ -492,9 +496,20 @@ var patternChooser = {
             function(a, b) { return a.killLength() - b.killLength(); }
         );
 
-        // TODO: remove
+        // Find in advance all the jumps in the patterns' kill length
         for(var i = 0; i < this.stillPatterns.length; i++) {
-            console.log(this.stillPatterns[i].killLength());
+            var killLength = this.stillPatterns[i].killLength();
+            while(this.borders.length <= killLength) {
+                this.borders.push(i);
+            }
+        }
+
+        // TODO remove this
+        for(var i = 0; i < this.stillPatterns.length; i++) {
+            console.log(i, this.stillPatterns[i].killLength());
+        }
+        for(var i = 0; i < this.borders.length; i++) {
+            console.log(i, this.borders[i]);
         }
 
         return this;
@@ -502,7 +517,13 @@ var patternChooser = {
 
     // Pick a random pattern appropriate for the current difficulty level
     pickPattern: function() {
-        return this.stillPatterns[game.rnd.between(0, this.stillPatterns.length - 1)];
+        // Choose any pattern whose killLength is <= what the snake can
+        // surround or could surround in any point in the past
+        var border = (snake.topLength + 1 < this.borders.length) ?
+            this.borders[snake.topLength + 1] : this.stillPatterns.length;
+
+        return (border == 0) ? blockPattern :
+            this.stillPatterns[game.rnd.between(0, border - 1)];
     }
 
 }.initialize();
@@ -518,7 +539,7 @@ var gameLogic = {
 
         // Plan the first colony drop. Always drop the same colony first (2x2 block).
         // All subsequent ones will be chosen at random
-        colony.generate(patterns[0]);
+        colony.generate(blockPattern);
         colony.spawnTick = colony.FIRST_DELAY;
 
         // Put the snake in start position
@@ -572,3 +593,5 @@ var gameLogic = {
     },
 
 }; // var gameLogic = {...}
+
+// TODO: start spawning something as soon as the game field is empty
