@@ -199,7 +199,7 @@ var colony = {
 
 var snake = {
     // Minimal allowed length of the snake
-    MIN_LENGTH: 20,
+    MIN_LENGTH: 15,
 
     // Maximal allowed length
     MAX_LENGTH: SIZE_X * SIZE_Y,
@@ -207,7 +207,7 @@ var snake = {
     // Length of the snake (desired) when the game starts. The nake will be
     // born with length 1 and immediately start growing until the length
     // reaches this value.
-    START_LENGTH: 20,
+    START_LENGTH: 15,
 
     // Special value saying that the snake doesn't occupy the given cell
     FREE: -1,
