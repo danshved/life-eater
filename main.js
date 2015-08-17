@@ -1,7 +1,6 @@
 var bootState = {
     preload: function() {
         game.load.spritesheet('cell', 'assets/cells.png', 16, 16);
-        game.load.spritesheet('hud-bar', 'assets/hud-bar.png', 100, 16);
         game.load.image('background', 'assets/background.png');
         game.load.image('hud-bg', 'assets/hud-bg.png');
         game.load.image('gameover-icons', 'assets/gameover-icons.png');
@@ -35,7 +34,6 @@ var gameState = {
     // Called by Phaser each time when we enter the 'game' state, i.e. a new game is starting
     create: function() {
         // Initialize all gamestate variables (Life field, snake, score etc.)
-        difficulty.reset();
         gameLogic.reset();
 
         // Prepare to accept user input
@@ -61,9 +59,6 @@ var gameState = {
         // Advance the game
         gameLogic.tick(inputQueue.maybePop());
 
-        // Increase difficulty if user has enough score
-        difficulty.tick();
-
         // Show what happened to the user
         grid.tick();
         hud.tick();
@@ -71,7 +66,7 @@ var gameState = {
         // Keep track of time
         currentTick++;
 
-        // Restart everything when we die
+        // Show game over screen when snake dies
         if(gameLogic.gameOver())
         {
             game.state.start('gameOver', false);
@@ -81,7 +76,7 @@ var gameState = {
 
 var gameOverState = {
     // Positioning of elements on the screen
-    TABLE_Y: 249,
+    TABLE_Y: 270,
     STEP_Y: 30,
     LEFT_X: 190,
     RIGHT_X: 450,
@@ -93,9 +88,7 @@ var gameOverState = {
     hint: null,
 
     // Results table
-    score: null,
     length: null,
-    level: null,
 
     // The sprite showing icons to the right of the results table
     icons: null,
@@ -103,7 +96,7 @@ var gameOverState = {
     // One-time initialization. Called by us from the 'boot' state
     initialize: function() {
         // "Game over" caption
-        this.gameOver = game.add.text(320, 163, 'GAME OVER',
+        this.gameOver = game.add.text(320, 200, 'GAME OVER',
                 { font: 'bold 36px Arial', fill: 'white' });
         this.gameOver.anchor.set(0.5);
 
@@ -113,9 +106,7 @@ var gameOverState = {
         this.hint.anchor.set(0.5, 1.0);
 
         // The results table
-        this.score = this.makeRow('Score', this.TABLE_Y);
-        this.length = this.makeRow('Length', this.TABLE_Y + this.STEP_Y);
-        this.level = this.makeRow('Difficulty', this.TABLE_Y + 2 * this.STEP_Y);
+        this.length = this.makeRow('Max length', this.TABLE_Y);
 
         // "Icons" to the left of the table
         this.icons = game.add.sprite(this.LEFT_X, this.TABLE_Y, 'gameover-icons');
@@ -141,9 +132,7 @@ var gameOverState = {
     // Called by Phaser each time the game enters the 'gameOver' state
     create: function() {
         // Update values in the results table
-        this.score.value.text = score;
-        this.length.value.text = snake.desiredLength;
-        this.level.value.text = difficulty.level + 1;
+        this.length.value.text = snake.topLength;
 
         // Show all the elements for the "game over" screen
         this.setVisible(true);
@@ -165,9 +154,7 @@ var gameOverState = {
         this.gameOver.visible = value;
         this.hint.visible = value;
         this.icons.visible = value;
-        this.setRowVisible(this.score, value);
         this.setRowVisible(this.length, value);
-        this.setRowVisible(this.level, value);
     },
 
     setRowVisible: function(row, value) {

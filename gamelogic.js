@@ -12,9 +12,6 @@ function inBounds(x, y) {
 // Current tick number
 var currentTick = 0;
 
-// Current score
-var score = 0;
-
 // Game of Life field
 var life = {
     // SIZE_X * SIZE_Y booleans. true/false = alive/dead cell.
@@ -125,12 +122,6 @@ var colony = {
     // Colony cells as a boolean array
     cells: [],
 
-    // Method to choose a random pattern. This will be replaced by the difficulty manager.
-    pickPatternContext: null,
-    pickPattern: function() {
-        return patterns[game.rnd.between(0, patterns.length - 1)];
-    },
-
     // Colony cells
     // dx, dy: RELATIVE coordinates inside the colony
     cellAt: function(dx, dy) {
@@ -155,7 +146,7 @@ var colony = {
     generate: function(pattern) {
         // Choose a pattern at random if one wasn't given
         if(!pattern) {
-            pattern = this.pickPattern.call(this.pickPatternContext);
+            pattern = patternChooser.pickPattern();
         }
 
         // Copy the pattern to our memory, and apply a random
@@ -231,6 +222,9 @@ var snake = {
     // in which case the snake will steadily grow.
     desiredLength: 0,
 
+    // The maximum value of ``desiredLength'' in the course of the game
+    topLength: 0,
+
     // Circular buffer for the tail segments
     tail: [],
     tailIn: 0,
@@ -279,6 +273,7 @@ var snake = {
 
         // Start growing
         this.desiredLength = this.START_LENGTH;
+        this.topLength = this.desiredLength;
 
         // Reset other misc. data
         this.hadLoop = false;
@@ -469,16 +464,54 @@ var snake = {
         } else if(this.desiredLength > this.MAX_LENGTH) {
             this.desiredLength = this.MAX_LENGTH;
         }
+
+        if(this.desiredLength > this.topLength) {
+            this.topLength = this.desiredLength;
+        }
     }
 
 }.initialize(); // var snake = {...}
+
+// The object that determines which patterns spawn on which level
+var patternChooser = {
+    // All still lifes
+    stillPatterns: [],
+
+    // One-time initialization
+    initialize: function() {
+        // Build the list of all "still life" patterns
+        for(var i = 0; i < patterns.length; i++) {
+            var pattern = patterns[i];
+            if(pattern.kind === 'still') {
+                this.stillPatterns.push(pattern);
+            }
+        }
+
+        // Sort by perimeter
+        this.stillPatterns.sort(
+            function(a, b) { return a.killLength() - b.killLength(); }
+        );
+
+        // TODO: remove
+        for(var i = 0; i < this.stillPatterns.length; i++) {
+            console.log(this.stillPatterns[i].killLength());
+        }
+
+        return this;
+    },
+
+    // Pick a random pattern appropriate for the current difficulty level
+    pickPattern: function() {
+        return this.stillPatterns[game.rnd.between(0, this.stillPatterns.length - 1)];
+    }
+
+}.initialize();
 
 var gameLogic = {
     // Reset the game state (i.e. start a new game)
     reset: function() {
         // Drop the colony
         currentTick = 0;
-        score = 0;
 
         // Empty the Life
         life.reset();
@@ -527,10 +560,6 @@ var gameLogic = {
                 }
             }
 
-            // Get points for the eaten Life. We're using a convex function to encourage
-            // eating many Life groups in one surround.
-            score += ateCells * ateCells;
-
             // Grow longer if we ate something, grow shorter otherwise as penalty
             snake.grow(ateCells ? 1 : -1);
         }
@@ -543,5 +572,3 @@ var gameLogic = {
     },
 
 }; // var gameLogic = {...}
-
-// TODO: try awarding length for cherries in an arithmetic progression (until the next self-bite)

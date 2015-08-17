@@ -169,21 +169,13 @@ var grid = {
     },
 };
 
-// Information above the game field: the current score etc.
+// Information above the game field: the current length etc.
 var hud = {
-    // Cherry frame position in the spritesheet
-    CHERRY_FRAME: 7,
-
     // Y coordinate of the text (vertical anchor is text center)
     TEXT_Y: 17,
 
     // Gap between pictograms and neighboring text
     X_GAP: 5,
-
-    // Position of the level progress bar
-    BAR_X: 270,
-    CHERRY_X: 135,
-    ICONS_Y: 6,
 
     // Font to use for all HUD text
     style: {
@@ -192,12 +184,7 @@ var hud = {
     },
 
     // Text objects
-    scoreText: null,
     lengthText: null,
-    levelText: null,
-
-    // Difficulty progress bar
-    bar: null,
 
     // Bar background sprite, i.e. the "icons"
     background: null,
@@ -207,22 +194,9 @@ var hud = {
         // HUD icons
         this.background = game.add.sprite(0, 0, 'hud-bg');
 
-        // Progress bar for the difficulty level
-        this.bar = game.add.sprite(this.BAR_X, this.ICONS_Y, 'hud-bar');
-
         // Snake length
         this.lengthText = game.add.text(40 + this.X_GAP, this.TEXT_Y, '0', this.style);
         this.lengthText.anchor.set(0.0, 0.5);
-
-        // Score
-        this.scoreText = game.add.text(game.width - 40 - this.X_GAP, this.TEXT_Y,
-            '0', this.style);
-        this.scoreText.anchor.set(1.0, 0.5);
-
-        // Difficulty level
-        this.levelText = game.add.text(this.BAR_X + 3 - this.X_GAP, this.TEXT_Y,
-            '0', this.style);
-        this.levelText.anchor.set(1.0, 0.5);
     },
 
     // Hide the HUD until the next tick()
@@ -235,23 +209,15 @@ var hud = {
         this.setVisible(true);
 
         // Update all text objects
-        this.lengthText.text = snake.desiredLength;
-        this.scoreText.text = score;
-        this.levelText.text = difficulty.level + 1;
-
-        // Draw the progress bar. Simply show the appropriate line of the spritesheet
-        this.bar.frame = Math.floor(15.0 * difficulty.levelProgress());
+        this.lengthText.text = (snake.desiredLength == snake.topLength) ?
+            snake.desiredLength : (snake.desiredLength.toString() + "/" + snake.topLength);
     },
 
     // Hide or show the entire HUD
     setVisible: function(value) {
         this.background.visible = value;
-        this.bar.visible = value;
         this.lengthText.visible = value;
-        this.scoreText.visible = value;
-        this.levelText.visible = value;
     }
-
 };
 
 // TODO: don't use the default font
