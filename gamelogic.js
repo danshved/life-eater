@@ -600,7 +600,7 @@ var gameLogic = {
     // Check if player lost the game in the last tick()
     gameOver: function() {
         return !inBounds(snake.head.x, snake.head.y)
-            || life.cellAt(snake.head.x, snake.head.y);
+            || (!snake.hadLoop && life.oldCellAt(snake.head.x, snake.head.y));
     },
 
 }; // var gameLogic = {...}
