@@ -12,7 +12,7 @@ var CELL_SIZE = 12;
 var grid = {
     // Indices of various frames in the spritesheet
     ALIVE_FRAME: 0,   // A Life cell
-    CHERRY_FRAME: 7,
+    BONUS_FRAME: 7,
     COLONY_FRAME: 14, // Cell of a Life colony to be spawned
     HTAIL_FRAME: 6,   // The entire snake when it has length 1
 
@@ -100,6 +100,10 @@ var grid = {
                 // Colony preview, if any
                 else if(colonyVisible && colony.absoluteCellAt(x, y)) {
                     this.showFrame(sprite, this.COLONY_FRAME);
+                }
+                // Bonus cell, if any
+                else if(bonus.exists && x == bonus.x && y == bonus.y) {
+                    this.showFrame(sprite, this.BONUS_FRAME);
                 }
                 // Empty cells where life just died
                 else if(wasAlive) {

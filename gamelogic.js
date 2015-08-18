@@ -102,6 +102,13 @@ var life = {
                 }
             }
         }
+    },
+
+    // Kill all the cells that are alive
+    killAll: function() {
+        for(var i = 0; i < this.cells.length; i++) {
+            this.cells[i] = false;
+        }
     }
 
 }.initialize();
@@ -531,6 +538,83 @@ var patternChooser = {
 
 }.initialize();
 
+// The bonus cell that appears after each increase and length and allows
+// to kill all Life on the field
+var bonus = {
+    // How long each bonus should persist on the field (in ticks)
+    DURATION: 50,
+
+    // How much longer the snake needs to grow to deserve each next bonus
+    LENGTH_PER_SPAWN: 5,
+
+    // Whether the bonus is on the field
+    exists: false,
+
+    // The bonus's position
+    x: 0,
+    y: 0,
+
+    // When the bonus must expire and disappear
+    expiryTick: 0,
+
+    // How many cherries have already been spawned
+    spawnCount: 0,
+
+    // Initialization. Called each time a new game starts.
+    reset: function() {
+        this.exists = false;
+        this.expiryTick = 0;
+        this.spawnCount = 0;
+    },
+
+    // Show/hide bonus or activate it when eaten by the snake.
+    // Invariant: after this call the bonus is not on the snake and
+    // not on a Life cell.
+    tick: function() {
+        // Activate bonus & make it disappear if the snake hit it
+        if(this.exists && snake.head.x == this.x && snake.head.y == this.y) {
+            life.killAll();
+            this.exists = false;
+            this.expiryTick = currentTick;
+        }
+
+        // Make the bonus appear (or prolong its existence) if the snake grew sufficiently
+        // longer
+        var desiredCount = Math.floor(
+            (snake.desiredLength - snake.START_LENGTH) / this.LENGTH_PER_SPAWN);
+        if(desiredCount > this.spawnCount) {
+            this.spawnCount = desiredCount;
+            this.expiryTick = currentTick + this.DURATION;
+        }
+
+        // Show/hide bonus based on the expiry time
+        if(currentTick >= this.expiryTick) {
+            this.exists = false;
+        } else {
+            // Don't let the bonus exist on top of life
+            if(life.cellAt(this.x, this.y))
+            {
+                this.exists = false;
+            }
+
+            // Locate bonus in a random spot if it isn't on the field
+            // i.e. it's just appeared or was hit by Life
+            if(!this.exists) {
+                this.maybeSpawn();
+            }
+        }
+    },
+
+    // Try to locate the bonus on a random place on the field. May not
+    // succeed if the field is too crowded.
+    maybeSpawn: function() {
+        this.x = game.rnd.between(0, SIZE_X - 1);
+        this.y = game.rnd.between(0, SIZE_Y - 1);
+        this.exists = !life.cellAt(this.x, this.y) &&
+            (snake.indexAt(this.x, this.y) == snake.FREE);
+    },
+}
+
 var gameLogic = {
     // Reset the game state (i.e. start a new game)
     reset: function() {
@@ -547,6 +631,10 @@ var gameLogic = {
 
         // Put the snake in start position
         snake.reset();
+
+        // Initialize the bonus so that it doesn't exist but will
+        // spawn when the snake grows longer
+        bonus.reset();
     },
 
     // Make one step in the game
@@ -595,6 +683,9 @@ var gameLogic = {
             // Grow longer if we ate something, grow shorter otherwise as penalty
             snake.grow(ateCells ? 1 : -1);
         }
+
+        // Show/hide/consume the bonus cell
+        bonus.tick();
     },
 
     // Check if player lost the game in the last tick()
