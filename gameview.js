@@ -44,6 +44,7 @@ var grid = {
                 sprite.animations.add('die', [0, 1, 2, 3, 4, 5], 18, false);
                 sprite.animations.add('appear', [5, 4, 3, 2, 1, 0], 18, false);
                 sprite.animations.add('annihilate', [8, 9, 10, 11, 12, 13], 24, false);
+                sprite.animations.add('killAll', [36, 37, 38, 39, 40, 41], 24, false);
                 sprite.visible = false;
                 this.sprites.push(sprite);
             }
@@ -84,6 +85,10 @@ var grid = {
                 // The snake
                 if(snakeIndex != snake.FREE) {
                     this.showSnakeSegment(sprite, snakeIndex);
+                }
+                // Cells destroyed by the bonus, if any
+                else if(bonus.wasUsed) {
+                    this.showAnimation(sprite, 'annihilate');
                 }
                 // Annihilated surrounded cells, if any
                 else if(snake.hadLoop && snake.loopClassAt(x, y) != snake.OUTSIDE) {

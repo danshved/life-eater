@@ -542,7 +542,7 @@ var patternChooser = {
 // to kill all Life on the field
 var bonus = {
     // How long each bonus should persist on the field (in ticks)
-    DURATION: 50,
+    DURATION: 100,
 
     // How much longer the snake needs to grow to deserve each next bonus
     LENGTH_PER_SPAWN: 5,
@@ -554,6 +554,9 @@ var bonus = {
     x: 0,
     y: 0,
 
+    // Whether the bonus was used in the last tick()
+    wasUsed: false,
+
     // When the bonus must expire and disappear
     expiryTick: 0,
 
@@ -563,6 +566,7 @@ var bonus = {
     // Initialization. Called each time a new game starts.
     reset: function() {
         this.exists = false;
+        this.wasUsed = false;
         this.expiryTick = 0;
         this.spawnCount = 0;
     },
@@ -572,8 +576,10 @@ var bonus = {
     // not on a Life cell.
     tick: function() {
         // Activate bonus & make it disappear if the snake hit it
+        this.wasUsed = false;
         if(this.exists && snake.head.x == this.x && snake.head.y == this.y) {
             life.killAll();
+            this.wasUsed = true;
             this.exists = false;
             this.expiryTick = currentTick;
         }
