@@ -186,6 +186,10 @@ var hud = {
     // Gap between pictograms and neighboring text
     X_GAP: 5,
 
+    // Food progress bar
+    BAR_X: 540,
+    BAR_Y: 9,
+
     // Font to use for all HUD text
     style: {
         font: 'bold 24px Arial',
@@ -196,7 +200,10 @@ var hud = {
     lengthText: null,
     foodText: null,
 
-    // Bar background sprite, i.e. the "icons"
+    // The "food bar" showing percentage of food eaten to grow longer
+    foodBar: null,
+
+    // HUD background sprite, i.e. the "icons"
     background: null,
 
     // One-time initialization
@@ -209,8 +216,14 @@ var hud = {
         this.lengthText.anchor.set(0.0, 0.5);
 
         // Food display (Life eaten/Life necessary to grow longer)
-        this.foodText = game.add.text(game.width - 6, this.TEXT_Y, '0', this.style);
+        this.foodText = game.add.text(this.BAR_X - this.X_GAP, this.TEXT_Y, '0', this.style);
         this.foodText.anchor.set(1.0, 0.5);
+
+        this.foodBar = game.add.sprite(this.BAR_X - 3, this.BAR_Y - 3, 'food-bar');
+
+        // Hide everything, we only need to show it when phaser
+        // enters the 'game' state
+        this.hide();
     },
 
     // Hide the HUD until the next tick()
@@ -222,11 +235,15 @@ var hud = {
         // Show everything if it was hidden
         this.setVisible(true);
 
-        // Update all text objects
+        // Show snake's length
         this.lengthText.text = (snake.desiredLength == snake.topLength) ?
             snake.desiredLength : (snake.desiredLength.toString() + "/" + snake.topLength);
 
-        this.foodText.text = growth.food.toString() + "/" + growth.foodNeeded();
+        // Show how much food it has eaten: show it as text and also as a progressbar
+        var foodNeeded = growth.foodNeeded();
+
+        this.foodText.text = growth.food.toString() + "/" + foodNeeded;
+        this.foodBar.frame = Math.round(15.0 * growth.food / foodNeeded);
     },
 
     // Hide or show the entire HUD
@@ -234,6 +251,7 @@ var hud = {
         this.background.visible = value;
         this.lengthText.visible = value;
         this.foodText.visible = value;
+        this.foodBar.visible = value;
     }
 };
 
