@@ -560,7 +560,7 @@ var bonus = {
     // When the bonus must expire and disappear
     expiryTick: 0,
 
-    // How many cherries have already been spawned
+    // How many bonuses have already been spawned
     spawnCount: 0,
 
     // Initialization. Called each time a new game starts.
@@ -619,12 +619,46 @@ var bonus = {
         this.exists = !life.cellAt(this.x, this.y) &&
             (snake.indexAt(this.x, this.y) == snake.FREE);
     },
-}
+
+}; // var bonus = {...};
+
+// The object that keeps track of food consumption by the snake and makes
+// the snake grow when enough food has been eaten.
+var growth = {
+    // How many Life cells have been eaten after the last length change
+    food: 0,
+
+    reset: function() {
+        this.food = 0;
+    },
+
+    // Register the fact that the snake ate ``amout'' Life cells. Make the snake
+    // grow if it's consumed enough.
+    eat: function(amount) {
+        this.food += amount;
+        while(this.food >= this.foodNeeded()) {
+            this.food -= this.foodNeeded();
+            snake.grow(1);
+            // TODO: win the game if max length is achieved
+        }
+    },
+
+    // Impose penalty when snake bites itself without surrounding any Life
+    penalize: function(amount) {
+        snake.grow(-1);
+        this.food = 0;
+    },
+
+    // How many Life cells are needed to advance from the current length to the next
+    // The result is always positive
+    foodNeeded: function() {
+        return Math.round(snake.desiredLength * 0.3);
+    }
+};
 
 var gameLogic = {
     // Reset the game state (i.e. start a new game)
     reset: function() {
-        // Drop the colony
         currentTick = 0;
 
         // Empty the Life
@@ -641,6 +675,9 @@ var gameLogic = {
         // Initialize the bonus so that it doesn't exist but will
         // spawn when the snake grows longer
         bonus.reset();
+
+        // Reset the food bar
+        growth.reset();
     },
 
     // Make one step in the game
@@ -669,14 +706,14 @@ var gameLogic = {
 
         // If the snake surrounded something, destroy all Life there
         if(snake.hadLoop) {
-            var ateCells = 0;
+            var cellsEaten = 0;
             for(var x = 0; x < SIZE_X; x++) {
                 for(var y = 0; y < SIZE_Y; y++) {
                     var situation = snake.loopClassAt(x, y);
 
                     // Consider as "eaten" all cells strictly inside the loop
                     if(situation == snake.INSIDE && life.cellAt(x, y)) {
-                        ateCells++;
+                        cellsEaten++;
                     }
 
                     // Destroy life inside and on the loop
@@ -686,8 +723,13 @@ var gameLogic = {
                 }
             }
 
-            // Grow longer if we ate something, grow shorter otherwise as penalty
-            snake.grow(ateCells ? 1 : -1);
+            // Eat Life if we surrounded any (and maybe grow longer).
+            // Grow shorter otherwise as penalty.
+            if(cellsEaten) {
+                growth.eat(cellsEaten);
+            } else {
+                growth.penalize();
+            }
         }
 
         // Show/hide/consume the bonus cell
@@ -702,4 +744,3 @@ var gameLogic = {
 
 }; // var gameLogic = {...}
 
-// TODO: start spawning something as soon as the game field is empty

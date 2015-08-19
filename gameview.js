@@ -194,6 +194,7 @@ var hud = {
 
     // Text objects
     lengthText: null,
+    foodText: null,
 
     // Bar background sprite, i.e. the "icons"
     background: null,
@@ -206,6 +207,10 @@ var hud = {
         // Snake length
         this.lengthText = game.add.text(40 + this.X_GAP, this.TEXT_Y, '0', this.style);
         this.lengthText.anchor.set(0.0, 0.5);
+
+        // Food display (Life eaten/Life necessary to grow longer)
+        this.foodText = game.add.text(game.width - 6, this.TEXT_Y, '0', this.style);
+        this.foodText.anchor.set(1.0, 0.5);
     },
 
     // Hide the HUD until the next tick()
@@ -220,12 +225,15 @@ var hud = {
         // Update all text objects
         this.lengthText.text = (snake.desiredLength == snake.topLength) ?
             snake.desiredLength : (snake.desiredLength.toString() + "/" + snake.topLength);
+
+        this.foodText.text = growth.food.toString() + "/" + growth.foodNeeded();
     },
 
     // Hide or show the entire HUD
     setVisible: function(value) {
         this.background.visible = value;
         this.lengthText.visible = value;
+        this.foodText.visible = value;
     }
 };
 
