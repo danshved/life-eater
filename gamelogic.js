@@ -161,20 +161,26 @@ var colony = {
     },
 
     // Choose a colony and determine when it will be spawned
-    generate: function(pattern) {
-        // Choose a pattern at random if one wasn't given
-        if(!pattern) {
-            pattern = patternChooser.pickPattern();
-        }
+    generate: function() {
+        this.generateHelper(patternChooser.pickPattern(), 0, 0, SIZE_X, SIZE_Y);
+    },
 
+    // Generate the first colony. The difference from generate() is that the first
+    // colony is always a 2x2 block and it never spawns near the wall, so it can
+    // always be surrounded.
+    generateFirst: function() {
+        this.generateHelper(blockPattern, 1, 1, SIZE_X - 2, SIZE_Y - 2);
+    },
+
+    generateHelper: function(pattern, x0, y0, sizeX, sizeY) {
         // Copy the pattern to our memory, and apply a random
         // rotation/reflection.
         var matrix = Matrix2.d8element(game.rnd.between(0, 3), game.rnd.between(0, 1));
         this.assignPattern(pattern, matrix);
 
         // Choose the spawn position on the field
-        this.x = game.rnd.between(0, SIZE_X - this.sizeX);
-        this.y = game.rnd.between(0, SIZE_Y - this.sizeY);
+        this.x = x0 + game.rnd.between(0, sizeX - this.sizeX);
+        this.y = y0 + game.rnd.between(0, sizeY - this.sizeY);
     },
 
     // Set the pattern that the colony will use
@@ -666,7 +672,7 @@ var gameLogic = {
 
         // Plan the first colony drop. Always drop the same colony first (2x2 block).
         // All subsequent ones will be chosen at random
-        colony.generate(blockPattern);
+        colony.generateFirst();
         colony.spawnTick = colony.FIRST_DELAY;
 
         // Put the snake in start position
