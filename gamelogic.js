@@ -545,7 +545,7 @@ var bonus = {
     DURATION: 100,
 
     // How much longer the snake needs to grow to deserve each next bonus
-    LENGTH_PER_SPAWN: 5,
+    LENGTH_PER_SPAWN: 1,
 
     // Whether the bonus is on the field
     exists: false,
@@ -652,7 +652,7 @@ var growth = {
     // How many Life cells are needed to advance from the current length to the next
     // The result is always positive
     foodNeeded: function() {
-        return Math.round(snake.desiredLength * 0.3);
+        return Math.round(snake.desiredLength * 0.5);
     }
 };
 
