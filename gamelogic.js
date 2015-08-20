@@ -220,7 +220,7 @@ var colony = {
 
 var snake = {
     // Minimal allowed length of the snake
-    MIN_LENGTH: 15,
+    MIN_LENGTH: 20,
 
     // Maximal allowed length
     MAX_LENGTH: SIZE_X * SIZE_Y,
@@ -228,7 +228,7 @@ var snake = {
     // Length of the snake (desired) when the game starts. The nake will be
     // born with length 1 and immediately start growing until the length
     // reaches this value.
-    START_LENGTH: 15,
+    START_LENGTH: 20,
 
     // Special value saying that the snake doesn't occupy the given cell
     FREE: -1,
@@ -533,10 +533,10 @@ var patternChooser = {
 
     // Pick a random pattern appropriate for the current difficulty level
     pickPattern: function() {
-        // Choose any pattern whose killLength is <= what the snake can
-        // surround or could surround in any point in the past
-        var border = (snake.topLength + 1 < this.borders.length) ?
-            this.borders[snake.topLength + 1] : this.stillPatterns.length;
+        // Choose any pattern whose killLength <= max snake length - 4.
+        // The -4 is to make things easier for the player.
+        var border = (snake.topLength - 3 < this.borders.length) ?
+            this.borders[snake.topLength - 3] : this.stillPatterns.length;
 
         return (border == 0) ? blockPattern :
             this.stillPatterns[game.rnd.between(0, border - 1)];
@@ -548,10 +548,10 @@ var patternChooser = {
 // to kill all Life on the field
 var bonus = {
     // How long each bonus should persist on the field (in ticks)
-    DURATION: 100,
+    DURATION: SIZE_X + SIZE_Y,
 
     // How much longer the snake needs to grow to deserve each next bonus
-    LENGTH_PER_SPAWN: 1,
+    LENGTH_PER_SPAWN: 5,
 
     // Whether the bonus is on the field
     exists: false,
