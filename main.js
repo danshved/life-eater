@@ -25,11 +25,10 @@ var gameState = {
 
     // One-time initialization. Called from the 'boot' state.
     initialize: function() {
-        // Create and show the empty field
+        // Create all sprites and text objects (but don't show them yet)
         grid.create();
-
-        // Create the HUD elements and show initial values
         hud.create();
+        lengthMessage.create();
     },
 
     // Called by Phaser each time when we enter the 'game' state, i.e. a new game is starting
@@ -46,6 +45,7 @@ var gameState = {
         // Show initial state of the game on the screen
         grid.tick();
         hud.tick();
+        lengthMessage.reset();
     },
 
     // Called by Phaser when we leave the 'game' state.
@@ -54,6 +54,7 @@ var gameState = {
         // they'll be reused in the next game.
         grid.hide();
         hud.hide();
+        lengthMessage.hide();
     },
 
     tick: function() {
@@ -63,6 +64,7 @@ var gameState = {
         // Show what happened to the user
         grid.tick();
         hud.tick();
+        lengthMessage.tick();
 
         // Keep track of time
         currentTick++;

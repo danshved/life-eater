@@ -255,4 +255,80 @@ var hud = {
     }
 };
 
+// The message that appears when snake's length changes
+var lengthMessage = {
+    // For how many ticks the message appears
+    DURATION: 2,
+
+    // Phaser's text object
+    message: null,
+
+    // Length of the snake before it started changing and the message appeared
+    oldLength: 0,
+
+    // Length of the snake reflected by the message right now
+    shownLength: 0,
+
+    // When the message should disappear
+    expiryTick: 0,
+
+    // One-time initialization
+    create: function() {
+        this.message = game.add.text(320, 240, 'Message', {
+            font: 'bold 30px Arial',
+            //fill: '#d4ff00', // green/yellow
+            //fill: '#ffffff',
+            //fill: '#000000',
+            fill: '#fff400', // yellow like Life
+            //fill: '#ff5500', // orange like bonuses
+            //fill: '#00ff62', // green like the snake
+            stroke: '#000000',
+            //stroke: '#ffffff',
+            //stroke: '#d4ff00',
+            strokeThickness: 4
+        });
+        this.message.anchor.set(0.5, 0.5);
+
+        this.hide();
+    },
+
+    // Initialization. Called each time a new game starts.
+    reset: function() {
+        this.oldLength = snake.START_LENGTH;
+        this.shownLength = snake.START_LENGTH;
+        this.expiryTick = 0;
+    },
+
+    tick: function() {
+        // Decide to show/update the message if the length has changed
+        if(snake.desiredLength != this.shownLength) {
+            // If the message isn't showing at the moment, remember the length
+            // that the snake had
+            if(currentTick > this.expiryTick) {
+                this.oldLength = this.shownLength;
+            }
+
+            // Plan to show the message and remember which length it will reflect
+            this.expiryTick = currentTick + this.DURATION;
+            this.shownLength = snake.desiredLength;
+
+            // Format the message text, either "+delta" or "-delta".
+            var delta = this.shownLength - this.oldLength;
+            this.message.text = (delta >= 0) ? ("+" + delta) : ("-" + (-delta));
+
+            // Locate the text not far from the snake's head
+            this.message.x = FIELD_X + snake.head.x * CELL_SIZE + 8;
+            this.message.y = FIELD_Y + snake.head.y * CELL_SIZE + 8 - 48;
+        }
+
+        // Show or hide the message based on what we decided
+        this.message.visible = (currentTick < this.expiryTick);
+    },
+
+    // Hide the message at least until the next tick()
+    hide: function() {
+        this.message.visible = false;
+    },
+};
+
 // TODO: don't use the default font
