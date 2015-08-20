@@ -91,7 +91,7 @@ var grid = {
                     this.showAnimation(sprite, 'annihilate');
                 }
                 // Annihilated surrounded cells, if any
-                else if(snake.hadLoop && snake.loopClassAt(x, y) != snake.OUTSIDE) {
+                else if(snake.loop && snake.loop.classAt(x, y) != snake.OUTSIDE) {
                     this.showAnimation(sprite, 'annihilate');
                 }
                 // Life cells, including those just born

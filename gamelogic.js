@@ -116,7 +116,7 @@ var life = {
 // Next Life colony that is about to be spawned
 var colony = {
     // How many ticks between game start and first colony spawn
-    FIRST_DELAY: 20,
+    FIRST_DELAY: 40,
 
     // Maximum delay until the colony is spawned after the game field becomes
     // completely empty
@@ -259,11 +259,25 @@ var snake = {
     // isn't under the snake.
     tailIndices: [],
 
-    // Whether or not there was a loop removal in the last tick()
-    hadLoop: false,
+    // Information about the loop that the snake made in the last tick(), or
+    // null if there was no loop
+    loop: null,
 
-    // The class of each cell w.r.t. the last loop made by the snake
-    loopClasses: [],
+    // Pre-allocated object to which ``loop'' points when there was a loop.
+    _loop: {
+        // The "class" of each cell w.r.t. the loop made by the snake, i.e.
+        // whether each cell is inside, outside, or on the boundary of the loop.
+        cellClasses: [],
+
+        // Get/set the loop class of the given cell
+        classAt: function(x, y) {
+            return this.cellClasses[x * SIZE_Y + y];
+        },
+
+        setClassAt: function(x, y, val) {
+            this.cellClasses[x * SIZE_Y + y] = val;
+        },
+    },
 
     // One-time initialization
     initialize: function() {
@@ -274,7 +288,7 @@ var snake = {
         }
 
         this.tailIndices.length = SIZE_X * SIZE_Y;
-        this.loopClasses.length = SIZE_X * SIZE_Y;
+        this._loop.cellClasses.length = SIZE_X * SIZE_Y;
 
         return this;
     },
@@ -300,7 +314,7 @@ var snake = {
         this.topLength = this.desiredLength;
 
         // Reset other misc. data
-        this.hadLoop = false;
+        this.loop = null;
     },
 
     // Returns the snake's length, head included
@@ -363,15 +377,6 @@ var snake = {
         this.tailIndices[x * SIZE_Y + y] = val;
     },
 
-    // Get/set the loop class of the given cell
-    loopClassAt: function(x, y) {
-        return this.loopClasses[x * SIZE_Y + y];
-    },
-
-    setLoopClassAt: function(x, y, val) {
-        this.loopClasses[x * SIZE_Y + y] = val;
-    },
-
     // Advance the snake one step further
     // direction (optional): which way to turn.
     tick: function(direction) {
@@ -395,7 +400,7 @@ var snake = {
 
     // Check if we've made a loop. If so, remove the looping part of the snake
     checkLoop: function() {
-        this.hadLoop = false;
+        this.loop = null;
 
         // Don't do anything if snake has hit the wall
         if(!inBounds(this.head.x, this.head.y)) {
@@ -410,7 +415,7 @@ var snake = {
 
         // Remember that there was a loop, and remember which cells were
         // inside/on the border of this loop.
-        this.hadLoop = true;
+        this.loop = this._loop;
         this.loopClassify(biteIndex, this.tailIn);
 
         // Remove the looping part, i.e. all cells between the head (exclusive)
@@ -464,7 +469,8 @@ var snake = {
                     curClass = (firstDiff * lastDiff > 0) ? this.INSIDE : this.OUTSIDE;
                 }
 
-                this.setLoopClassAt(x, y, curClass);
+                // Remember the class of the current cell
+                this.loop.setClassAt(x, y, curClass);
             }
         }
     },
@@ -658,7 +664,8 @@ var growth = {
     // How many Life cells are needed to advance from the current length to the next
     // The result is always positive
     foodNeeded: function() {
-        return Math.round(snake.desiredLength * 0.5);
+        return 1;
+        //return Math.round(snake.desiredLength * 0.5);
     }
 };
 
@@ -711,11 +718,11 @@ var gameLogic = {
         snake.tick(userInput);
 
         // If the snake surrounded something, destroy all Life there
-        if(snake.hadLoop) {
+        if(snake.loop) {
             var cellsEaten = 0;
             for(var x = 0; x < SIZE_X; x++) {
                 for(var y = 0; y < SIZE_Y; y++) {
-                    var situation = snake.loopClassAt(x, y);
+                    var situation = snake.loop.classAt(x, y);
 
                     // Consider as "eaten" all cells strictly inside the loop
                     if(situation == snake.INSIDE && life.cellAt(x, y)) {
@@ -745,7 +752,7 @@ var gameLogic = {
     // Check if player lost the game in the last tick()
     gameOver: function() {
         return !inBounds(snake.head.x, snake.head.y)
-            || (!snake.hadLoop && life.oldCellAt(snake.head.x, snake.head.y));
+            || (!snake.loop && life.oldCellAt(snake.head.x, snake.head.y));
     },
 
 }; // var gameLogic = {...}
