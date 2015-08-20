@@ -116,7 +116,7 @@ var life = {
 // Next Life colony that is about to be spawned
 var colony = {
     // How many ticks between game start and first colony spawn
-    FIRST_DELAY: 40,
+    FIRST_DELAY: 20,
 
     // Maximum delay until the colony is spawned after the game field becomes
     // completely empty
@@ -268,6 +268,12 @@ var snake = {
         // The "class" of each cell w.r.t. the loop made by the snake, i.e.
         // whether each cell is inside, outside, or on the boundary of the loop.
         cellClasses: [],
+
+        // The bounding box of the loop
+        minX: 0,
+        maxX: 0,
+        minY: 0,
+        maxY: 0,
 
         // Get/set the loop class of the given cell
         classAt: function(x, y) {
@@ -432,6 +438,17 @@ var snake = {
     // Classify all field cells w.r.t. a loop made by the snake
     // [start, end): indices of segments making the loop (in the ``tail'' circular array)
     loopClassify: function(start, end) {
+        // Cache reference for convenience
+        var loop = this.loop;
+
+        // Initialize the bounding box
+        var pos = this.tail[start];
+        loop.minX = this.loop.maxX = pos.x;
+        loop.minY = this.loop.maxY = pos.y;
+
+        // Determine classes of cells column by column. In each column we transition
+        // between "outside" and "inside" by crossing the loop. We can tell inside from
+        // outside using the direction of the intersecting loop portion.
         for(var x = 0; x < SIZE_X; x++) {
             // We always start outside the loop
             var curClass = this.OUTSIDE;
@@ -470,7 +487,15 @@ var snake = {
                 }
 
                 // Remember the class of the current cell
-                this.loop.setClassAt(x, y, curClass);
+                loop.setClassAt(x, y, curClass);
+
+                // Update the loop's bounding box
+                if(curClass == this.BORDER) {
+                    loop.minX = Math.min(loop.minX, x);
+                    loop.maxX = Math.max(loop.maxX, x);
+                    loop.minY = Math.min(loop.minY, y);
+                    loop.maxY = Math.max(loop.maxY, y);
+                }
             }
         }
     },
@@ -664,7 +689,7 @@ var growth = {
     // How many Life cells are needed to advance from the current length to the next
     // The result is always positive
     foodNeeded: function() {
-        return 1;
+        return 10;
         //return Math.round(snake.desiredLength * 0.5);
     }
 };

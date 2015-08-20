@@ -285,6 +285,8 @@ var lengthMessage = {
             stroke: '#000000',
             //stroke: '#ffffff',
             //stroke: '#d4ff00',
+            //stroke: '#fff400',
+            //stroke: '#00ff62',
             strokeThickness: 4
         });
         this.message.anchor.set(0.5, 0.5);
@@ -316,9 +318,23 @@ var lengthMessage = {
             var delta = this.shownLength - this.oldLength;
             this.message.text = (delta >= 0) ? ("+" + delta) : ("-" + (-delta));
 
-            // Locate the text not far from the snake's head
-            this.message.x = FIELD_X + snake.head.x * CELL_SIZE + 8;
-            this.message.y = FIELD_Y + snake.head.y * CELL_SIZE + 8 - 48;
+            // Locate the message in the center of the loop that led to the
+            // change in length. Note: changes in snake's length are always
+            // triggered by a loop (= self-bite), but for robustness we also
+            // handle the case if there was no loop, in which case we show the
+            // message near the snake's head.
+            var x = snake.head.x, y = snake.head.y;
+            if(snake.loop) {
+                x = 0.5 * (snake.loop.minX + snake.loop.maxX);
+                y = 0.5 * (snake.loop.minY + snake.loop.maxY);
+            }
+            if(Math.abs(x - snake.head.x) <= 1 && Math.abs(y - snake.head.y) <= 2) {
+                x = (snake.head.x < SIZE_X - 5) ? (snake.head.x + 3) : (snake.head.x - 3);
+                y = snake.head.y;
+                //y = (snake.head.y >= 5) ? (snake.head.y - 3) : (snake.head.y + 3);
+            }
+            this.message.x = FIELD_X + x * CELL_SIZE + 8;
+            this.message.y = FIELD_Y + y * CELL_SIZE + 8;
         }
 
         // Show or hide the message based on what we decided
