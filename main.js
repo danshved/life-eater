@@ -1,16 +1,44 @@
 var bootState = {
     preload: function() {
-        game.load.spritesheet('cell', 'assets/cells.png', 16, 16);
-        game.load.spritesheet('food-bar', 'assets/food-bar.png', 100, 16);
+        // Load images for the "loading" screen: background and progress bar
         game.load.image('background', 'assets/background.png');
-        game.load.image('hud-bg', 'assets/hud-bg.png');
-        game.load.image('gameover-icons', 'assets/gameover-icons.png');
-        game.load.audio('loop', ['assets/loop.mp3', 'assets/loop.ogg']);
+        game.load.spritesheet('load-bar', 'assets/food-bar.png', 100, 16);
     },
 
     create: function() {
         // Show the bg image: grid around the game field
         game.add.sprite(0, 0, 'background');
+
+        game.state.start('load', false);
+    },
+};
+
+var loadState = {
+    // Progress bar sprite
+    bar: null,
+
+    preload: function() {
+        // Show the loading progress bar
+        this.bar = game.add.sprite(270, 236, 'load-bar', 0);
+
+        // Queue all game assets for loading
+        game.load.spritesheet('cell', 'assets/cells.png', 16, 16);
+        game.load.spritesheet('food-bar', 'assets/food-bar.png', 100, 16);
+        game.load.image('hud-bg', 'assets/hud-bg.png');
+        game.load.image('gameover-icons', 'assets/gameover-icons.png');
+        game.load.audio('loop', ['assets/loop.mp3', 'assets/loop.ogg']);
+    },
+
+    // Called by Phaser frequently while loading is in progress
+    loadUpdate: function() {
+        this.bar.frame = Math.round(15.0 * game.load.progressFloat / 100.0);
+    },
+
+    // Called by Phaser once after loading is complete
+    create: function() {
+        // Remove the progress bar: we don't need it any more
+        this.bar.destroy();
+        this.bar = null;
 
         // Start playing the music
         game.add.audio('loop', 1, true).play();
@@ -173,6 +201,7 @@ var gameOverState = {
 // Tell Phaser to launch the game
 var game = new Phaser.Game(640, 480, Phaser.AUTO, '');
 game.state.add('boot', bootState);
+game.state.add('load', loadState);
 game.state.add('game', gameState);
 game.state.add('gameOver', gameOverState);
 game.state.start('boot');
