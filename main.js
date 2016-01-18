@@ -5,11 +5,15 @@ var bootState = {
         game.load.image('background', 'assets/background.png');
         game.load.image('hud-bg', 'assets/hud-bg.png');
         game.load.image('gameover-icons', 'assets/gameover-icons.png');
+        game.load.audio('loop', ['assets/loop.mp3', 'assets/loop.ogg']);
     },
 
     create: function() {
         // Show the bg image: grid around the game field
         game.add.sprite(0, 0, 'background');
+
+        // Start playing the music
+        game.add.audio('loop', 1, true).play();
 
         // Run one-time initializations for all the other states
         gameState.initialize();
